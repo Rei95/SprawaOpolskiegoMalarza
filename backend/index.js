@@ -6,9 +6,11 @@ const sqlite3 = require('sqlite3').verbose();
 const axios = require('axios');
 
 const app = express();
-const port = 3001;
 
-// Przykładowe prompty dla pokojów (nie muszą być tu, jeśli używasz przekazywania promptu z frontu!)
+// Używaj portu z Render lub 3001 lokalnie
+const port = process.env.PORT || 3001;
+
+// Przykładowe prompty dla pokojów (możesz je usunąć jeśli nie używasz!)
 const chatPrompts = {
   'detektyw': 'Jesteś starym, cynicznym detektywem noir. Odpowiadasz krótko, z przekąsem.',
   'medium':   'Jesteś nawiedzonym medium, twoje odpowiedzi są mroczne i niejasne.',
@@ -76,8 +78,7 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
   }
 });
 
-// Klasyczny endpoint na bazowy prompt (jeśli korzystasz z przekazywania promptu z frontu – POLECANE!)
-// Wtedy możesz nie potrzebować tablicy chatPrompts w backendzie!
+// Klasyczny endpoint na bazowy prompt (polecany! przekazujesz prompt z frontu)
 app.post('/api/ask-gpt', async (req, res) => {
   const { message, prompt } = req.body;
   console.log("WIADOMOŚĆ Z FRONTU:", message);
@@ -106,6 +107,7 @@ app.post('/api/ask-gpt', async (req, res) => {
   }
 });
 
+// Nasłuchiwanie na odpowiednim porcie!
 app.listen(port, () => {
   console.log(`Backend listening at http://localhost:${port}`);
 });
