@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+// Pobieramy adres API z .env lub domyślnie localhost
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
 function ChatBox({
   title = 'Pokój czatu',
   avatar,
@@ -42,9 +45,9 @@ function ChatBox({
     ]);
 
     try {
-      // Dynamiczny endpoint na podstawie roomId z URL
+      // Poprawny dynamiczny endpoint!
       const res = await fetch(
-        `https://sprawaopolskiegomalarza-1.onrender.com/api/room/${roomId}/ask-gpt`,
+        `${API_BASE}/api/room/${roomId}/ask-gpt`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -136,8 +139,8 @@ function ChatBox({
             height: 48,
             borderRadius: '50%',
             border: 'none',
-            background: '#e05',        // czerwone tło jak "?"
-            color: '#fff700',           // żółta gwiazdka
+            background: '#e05',
+            color: '#fff700',
             fontWeight: 'bold',
             fontSize: 25,
             display: 'flex',
