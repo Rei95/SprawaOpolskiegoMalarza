@@ -21,12 +21,9 @@ function ChatBox({
   const [showClue, setShowClue] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-
-  // Dodaj ref do przewijania
   const chatBodyRef = useRef(null);
 
   useEffect(() => {
-    // Automatyczne przewijanie do dołu po dodaniu wiadomości
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
@@ -95,7 +92,7 @@ function ChatBox({
       {/* PRZYCISKI POMOCY I GWIAZDKI */}
       <div style={{
         position: 'absolute',
-        top: 10, // bliżej rogu na mobile
+        top: 18,
         right: 18,
         display: 'flex',
         gap: 10,
@@ -142,10 +139,12 @@ function ChatBox({
             cursor: 'pointer'
           }}
           aria-label="Poszlaka"
-        >★</button>
+        >
+          <span className="star-icon">★</span>
+        </button>
       </div>
 
-      {/* MODAL Z PODPOWIEDZIAMI */}
+      {/* MODALE */}
       {showHelp && (
         <div
           style={{
@@ -193,7 +192,6 @@ function ChatBox({
         </div>
       )}
 
-      {/* MODAL Z POSZLAKĄ */}
       {showClue && clueImage && (
         <div
           style={{
@@ -287,38 +285,21 @@ function ChatBox({
           </div>
         ))}
       </div>
-      <form onSubmit={handleSend} style={{ display: 'flex', gap: 10, width: '100%' }}>
+      
+      {/* Przycisk i pole na dole */}
+      <form onSubmit={handleSend} className="chat-input-bar">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 8,
-            border: '1px solid #333',
-            background: '#fff',
-            color: '#111'
-          }}
           placeholder="Napisz wiadomość..."
         />
-        <button type="submit"
-          style={{
-            background: '#720026',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '0 18px',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}
-        >Wyślij</button>
+        <button type="submit">Wyślij</button>
       </form>
 
-      {/* PRZYCISK ZAKOŃCZ */}
       <button
         onClick={handleEnd}
         style={{
-          marginTop: 18,
+          marginTop: 12,
           background: '#720026',
           color: '#fff',
           border: 'none',
