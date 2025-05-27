@@ -18,7 +18,10 @@ const chatPrompts = {
   // dodaj więcej pokoi...
 };
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://sprawaopolskiegomalarza-1.onrender.com'
+}));
+
 app.use(bodyParser.json());
 
 const db = new sqlite3.Database('mails.db');
