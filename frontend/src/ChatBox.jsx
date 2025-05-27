@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-// Pobieramy adres API z .env lub domyślnie localhost
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 function ChatBox({
@@ -22,6 +21,16 @@ function ChatBox({
   const [showClue, setShowClue] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
+
+  // Dodaj ref do przewijania
+  const chatBodyRef = useRef(null);
+
+  useEffect(() => {
+    // Automatyczne przewijanie do dołu po dodaniu wiadomości
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleEnd = () => {
     setEnded(true);
@@ -45,7 +54,6 @@ function ChatBox({
     ]);
 
     try {
-      // Poprawny dynamiczny endpoint!
       const res = await fetch(
         `${API_BASE}/api/room/${roomId}/ask-gpt`,
         {
@@ -71,19 +79,8 @@ function ChatBox({
 
   if (ended) {
     return (
-      <div
+      <div className="chat-box-main"
         style={{
-          background: '#1a1a1a',
-          borderRadius: 12,
-          boxShadow: '0 0 24px #720026',
-          padding: 24,
-          maxWidth: 420,
-          minHeight: 320,
-          color: '#fff',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
           justifyContent: 'center',
         }}
       >
@@ -94,28 +91,22 @@ function ChatBox({
   }
 
   return (
-    <div style={{
-      position: 'relative',
-      background: '#1a1a1a',
-      borderRadius: 12,
-      boxShadow: '0 0 24px #720026',
-      padding: 24,
-      maxWidth: 420,
-      minHeight: 320,
-      color: '#fff',
-      display: 'flex',
-      flexDirection: 'column',
-      width: '100%',
-      alignItems: 'center'
-    }}>
+    <div className="chat-box-main">
       {/* PRZYCISKI POMOCY I GWIAZDKI */}
-      <div style={{ position: 'absolute', top: -25, right: -25, display: 'flex', gap: 10, zIndex: 5 }}>
+      <div style={{
+        position: 'absolute',
+        top: 10, // bliżej rogu na mobile
+        right: 18,
+        display: 'flex',
+        gap: 10,
+        zIndex: 5
+      }}>
         {/* POMOC */}
         <button
           onClick={() => setShowHelp(true)}
           style={{
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             borderRadius: '50%',
             border: 'none',
             background: '#e05',
@@ -135,8 +126,8 @@ function ChatBox({
         <button
           onClick={() => setShowClue(true)}
           style={{
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             borderRadius: '50%',
             border: 'none',
             background: '#e05',
@@ -246,7 +237,7 @@ function ChatBox({
             <h2 style={{ marginTop: 0, marginBottom: 20, color: '#fff700', fontWeight: 700 }}>{clueTitle}</h2>
             <img src={clueImage} alt="Poszlaka" style={{
               maxWidth: 320, maxHeight: 220, borderRadius: 10, boxShadow: '0 0 16px #fff70088', marginBottom: 6
-            }}/>
+            }} />
           </div>
         </div>
       )}
@@ -268,13 +259,10 @@ function ChatBox({
       )}
 
       <h2 style={{ textAlign: 'center', color: '#e05', margin: 0, marginBottom: 6 }}>{title}</h2>
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        marginBottom: 12,
-        marginTop: 10,
-        width: '100%'
-      }}>
+      <div
+        ref={chatBodyRef}
+        className="chat-messages"
+      >
         {messages.map((msg, i) => (
           <div
             key={i}
