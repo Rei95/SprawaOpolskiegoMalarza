@@ -57,7 +57,7 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
@@ -79,15 +79,25 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
 });
 
 // Uniwersalny endpoint – prompt z frontu
-app.post('/api/ask-gpt', async (req, res) => {
-  const { message, prompt } = req.body;
+app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
+  const { roomId } = req.params;
+  const { message } = req.body;
+
+  const systemPrompt = chatPrompts[roomId];
+
+  if (!systemPrompt) {
+    return res.status(404).json({ error: 'Nie znaleziono czatu.' });
+  }
+
   try {
+    console.log('Próba połączenia z OpenAI, prompt:', systemPrompt, 'wiadomość:', message);
+
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
         messages: [
-          { role: "system", content: prompt || "Jesteś tajemniczym świadkiem w klimacie mrocznego kryminału. Odpowiadaj klimatycznie, nie mów wprost, prowokuj gracza do dalszego zadawania pytań." },
+          { role: "system", content: systemPrompt },
           { role: "user", content: message }
         ]
       },
@@ -101,7 +111,7 @@ app.post('/api/ask-gpt', async (req, res) => {
     const answer = response.data.choices[0].message.content;
     res.json({ answer });
   } catch (error) {
-    console.error('Błąd AI:', error.response ? error.response.data : error.message);
+    console.error('Błąd AI:', error.response ? error.response.data : error.message);  // <-- TO JEST KLUCZOWE!
     res.status(500).json({ error: "Błąd AI" });
   }
 });
