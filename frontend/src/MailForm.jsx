@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from './assets/logo.png';
 
@@ -6,7 +6,15 @@ function MailForm() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { roomId } = useParams(); // <-- pobieranie z URL
+  const { roomId } = useParams();
+
+  // Jeśli email dla tego pokoju już jest w localStorage, od razu wpuść do czatu
+  useEffect(() => {
+    const saved = localStorage.getItem(`room-${roomId}-email`);
+    if (saved) {
+      navigate(`/room/${roomId}/chat`);
+    }
+  }, [roomId, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,19 +22,24 @@ function MailForm() {
       setError('Podaj poprawny email!');
       return;
     }
-    // Weryfikuj email pod konkretny roomId
-    const res = await fetch(`https://sprawaopolskiegomalarza.onrender.com/api/room/${roomId}/check-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-    if (data.exists) {
-      setError('Ten email już był użyty w tym pokoju!');
-      return;
+    try {
+      const res = await fetch(`https://sprawaopolskiegomalarza.onrender.com/api/room/${roomId}/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) throw new Error('Błąd serwera.');
+      const data = await res.json();
+      if (data.exists) {
+        setError('Ten email już był użyty w tym pokoju!');
+        return;
+      }
+      // Zapisz email do localStorage dla tego pokoju!
+      localStorage.setItem(`room-${roomId}-email`, email);
+      navigate(`/room/${roomId}/chat`);
+    } catch (err) {
+      setError('Nie udało się połączyć z serwerem.');
     }
-    // Jeżeli OK, przechodzimy do czatu tego pokoju
-    navigate(`/room/${roomId}/chat`);
   };
 
   return (
