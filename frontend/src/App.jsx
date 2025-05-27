@@ -11,6 +11,7 @@ import ChatBox from "./ChatBox";
 import './App.css'; // upewnij się że ten plik istnieje!
 import majewskaImg from './assets/majewska.png';
 import prawyImg from './assets/prawy.png';
+import PyszneImg from './assets/Pyszne.png';
 
 // Definicja promptów i tytułów dla pokojów
 const chatRooms = {
