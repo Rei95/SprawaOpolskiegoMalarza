@@ -8,25 +8,25 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Przykładowe prompty (możesz dodać więcej!)
+// Przykładowe prompty (tu wpisuj ID pokoju i prompt!)
 const chatPrompts = {
   'detektyw': 'Jesteś starym, cynicznym detektywem noir. Odpowiadasz krótko, z przekąsem.',
   'medium':   'Jesteś nawiedzonym medium, twoje odpowiedzi są mroczne i niejasne.',
   'oficer':   'Jesteś rzeczowym policjantem udzielającym suchych informacji o sprawie.',
-  // ...dodaj kolejne pokoje
+  // dodaj kolejne pokoje według potrzeb!
 };
 
-// CORS na cały frontend – DOSTOSUJ do swojego adresu!
+// Ustaw CORS na swój frontend!
 app.use(cors({
   origin: 'https://sprawaopolskiegomalarza-1.onrender.com'
 }));
 app.use(bodyParser.json());
 
-// Baza maili z rozróżnieniem na pokoje
+// Baza maili – jeden email na jeden pokój
 const db = new sqlite3.Database('mails.db');
 db.run('CREATE TABLE IF NOT EXISTS emails (email TEXT, roomId TEXT, PRIMARY KEY(email, roomId))');
 
-// SPRAWDZANIE I ZAPIS MAILA (tylko do konkretnego pokoju)
+// Sprawdzanie i zapis maila pod konkretny pokój
 app.post('/api/room/:roomId/check-email', (req, res) => {
   const { roomId } = req.params;
   const { email } = req.body;
@@ -45,49 +45,13 @@ app.post('/api/room/:roomId/check-email', (req, res) => {
   });
 });
 
-// Czaty: wysyłka do AI według promptu pokoju
+// JEDEN endpoint do czatu AI!
 app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
   const { roomId } = req.params;
   const { message } = req.body;
 
   const systemPrompt = chatPrompts[roomId];
   if (!systemPrompt) return res.status(404).json({ error: 'Nie znaleziono czatu.' });
-
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message }
-        ]
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    const answer = response.data.choices[0].message.content;
-    res.json({ answer });
-  } catch (error) {
-    console.error('Błąd AI:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: "Błąd AI" });
-  }
-});
-
-// Uniwersalny endpoint – prompt z frontu
-app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
-  const { roomId } = req.params;
-  const { message } = req.body;
-
-  const systemPrompt = chatPrompts[roomId];
-
-  if (!systemPrompt) {
-    return res.status(404).json({ error: 'Nie znaleziono czatu.' });
-  }
 
   try {
     console.log('Próba połączenia z OpenAI, prompt:', systemPrompt, 'wiadomość:', message);
@@ -111,7 +75,7 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
     const answer = response.data.choices[0].message.content;
     res.json({ answer });
   } catch (error) {
-    console.error('Błąd AI:', error.response ? error.response.data : error.message);  // <-- TO JEST KLUCZOWE!
+    console.error('Błąd AI:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: "Błąd AI" });
   }
 });
