@@ -7,27 +7,32 @@ function MailForm() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.includes('@')) {
-      setError('Podaj poprawny email!');
-      return;
-    }
-    // Sprawdź email w backendzie (możesz zmienić adres, jeśli inny port/backend)
-    const res = await fetch('http://localhost:3001/api/check-email', {
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!email.includes('@')) {
+    setError('Podaj poprawny email!');
+    return;
+  }
+  try {
+    const res = await fetch('https://sprawaopolskiegomalarza-1.onrender.com/api/check-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
     });
+    if (!res.ok) {
+      setError('Błąd połączenia z serwerem!');
+      return;
+    }
     const data = await res.json();
     if (data.exists) {
       setError('Ten email już był użyty!');
       return;
     }
-    // Jeśli OK, przenosimy do pokoju 1 (lub możesz dodać wybór pokoju)
     navigate('/room/1');
-  };
-
+  } catch (err) {
+    setError('Nie udało się połączyć z serwerem!');
+  }
+};
   return (
     <div style={{
       background: "#1a1a1a",
