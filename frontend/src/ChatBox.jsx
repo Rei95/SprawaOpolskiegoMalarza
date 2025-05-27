@@ -44,7 +44,7 @@ function ChatBox({
     try {
       // Dynamiczny endpoint na podstawie roomId z URL
       const res = await fetch(
-        `https://sprawaopolskiegomalarza.onrender.com/api/room/${roomId}/ask-gpt`,
+        `https://sprawaopolskiegomalarza-1.onrender.com/api/room/${roomId}/ask-gpt`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
