@@ -6,55 +6,52 @@ const sqlite3 = require('sqlite3').verbose();
 const axios = require('axios');
 
 const app = express();
-
-// Używaj portu z Render lub 3001 lokalnie
 const port = process.env.PORT || 3001;
 
-// Przykładowe prompty dla pokojów (możesz je usunąć jeśli nie używasz!)
+// Przykładowe prompty (możesz dodać więcej!)
 const chatPrompts = {
   'detektyw': 'Jesteś starym, cynicznym detektywem noir. Odpowiadasz krótko, z przekąsem.',
   'medium':   'Jesteś nawiedzonym medium, twoje odpowiedzi są mroczne i niejasne.',
   'oficer':   'Jesteś rzeczowym policjantem udzielającym suchych informacji o sprawie.',
-  // dodaj więcej pokoi...
+  // ...dodaj kolejne pokoje
 };
 
+// CORS na cały frontend – DOSTOSUJ do swojego adresu!
 app.use(cors({
   origin: 'https://sprawaopolskiegomalarza-1.onrender.com'
 }));
-
 app.use(bodyParser.json());
 
+// Baza maili z rozróżnieniem na pokoje
 const db = new sqlite3.Database('mails.db');
+db.run('CREATE TABLE IF NOT EXISTS emails (email TEXT, roomId TEXT, PRIMARY KEY(email, roomId))');
 
-// Tworzymy tabelę na maile (jeśli nie istnieje)
-db.run('CREATE TABLE IF NOT EXISTS emails (email TEXT PRIMARY KEY)');
+// SPRAWDZANIE I ZAPIS MAILA (tylko do konkretnego pokoju)
+app.post('/api/room/:roomId/check-email', (req, res) => {
+  const { roomId } = req.params;
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Brak emaila!" });
 
-// Sprawdzanie i zapis maila
-app.post('/api/check-email', (req, res) => {
-  const email = req.body.email;
-  db.get('SELECT email FROM emails WHERE email = ?', [email], (err, row) => {
+  db.get('SELECT email FROM emails WHERE email = ? AND roomId = ?', [email, roomId], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (row) {
-      res.json({ exists: true }); // Mail już użyty
+      res.json({ exists: true }); // Mail już użyty w tym pokoju
     } else {
-      db.run('INSERT INTO emails(email) VALUES(?)', [email], (err) => {
+      db.run('INSERT INTO emails(email, roomId) VALUES(?, ?)', [email, roomId], (err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ exists: false }); // Nowy mail – zapisany
+        res.json({ exists: false }); // Nowy mail – zapisany do tego pokoju
       });
     }
   });
 });
 
-// Nowy endpoint: czaty po roomId (prompt pobierany z tablicy chatPrompts)
+// Czaty: wysyłka do AI według promptu pokoju
 app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
   const { roomId } = req.params;
   const { message } = req.body;
 
   const systemPrompt = chatPrompts[roomId];
-
-  if (!systemPrompt) {
-    return res.status(404).json({ error: 'Nie znaleziono czatu.' });
-  }
+  if (!systemPrompt) return res.status(404).json({ error: 'Nie znaleziono czatu.' });
 
   try {
     const response = await axios.post(
@@ -81,10 +78,9 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
   }
 });
 
-// Klasyczny endpoint na bazowy prompt (polecany! przekazujesz prompt z frontu)
+// Uniwersalny endpoint – prompt z frontu
 app.post('/api/ask-gpt', async (req, res) => {
   const { message, prompt } = req.body;
-  console.log("WIADOMOŚĆ Z FRONTU:", message);
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
@@ -110,7 +106,6 @@ app.post('/api/ask-gpt', async (req, res) => {
   }
 });
 
-// Nasłuchiwanie na odpowiednim porcie!
 app.listen(port, () => {
   console.log(`Backend listening at http://localhost:${port}`);
 });

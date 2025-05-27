@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function ChatBox({
-  prompt = '',
   title = 'Pokój czatu',
   avatar,
   firstMessage = 'Świadek stoi przed Tobą, zacznij rozmowę detektywie!',
   helpText = "Brak podpowiedzi dla tego pokoju.",
-  clueImage,      // <-- DODAJ TO!
-  clueTitle = "Poszlaka", // <-- DODAJ TO!
+  clueImage,
+  clueTitle = "Poszlaka",
   onEnd
 }) {
   const [messages, setMessages] = useState([
@@ -19,6 +18,7 @@ function ChatBox({
   const [showHelp, setShowHelp] = useState(false);
   const [showClue, setShowClue] = useState(false);
   const navigate = useNavigate();
+  const { roomId } = useParams();
 
   const handleEnd = () => {
     setEnded(true);
@@ -42,14 +42,15 @@ function ChatBox({
     ]);
 
     try {
-      const res = await fetch('https://sprawaopolskiegomalarza.onrender.com/api/ask-gpt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: input,
-          prompt
-        }),
-      });
+      // Dynamiczny endpoint na podstawie roomId z URL
+      const res = await fetch(
+        `https://sprawaopolskiegomalarza.onrender.com/api/room/${roomId}/ask-gpt`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: input }),
+        }
+      );
       const data = await res.json();
 
       setMessages(msgs => [
