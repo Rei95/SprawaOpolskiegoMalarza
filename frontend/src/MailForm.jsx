@@ -14,7 +14,7 @@ function MailForm() {
     return;
   }
   try {
-    const res = await fetch('https://sprawaopolskiegomalarza-1.onrender.com/api/check-email', {
+    const res = await fetch('https://sprawaopolskiegomalarza.onrender.com/api/check-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
