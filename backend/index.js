@@ -8,9 +8,9 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// --- CORS: Dostosuj do swojego frontu ---
 app.use(cors({
-  origin: 'https://sprawaopolskiegomalarza.onrender.com'
+  origin: 'https://sprawaopolskiegomalarza-1.onrender.com',
+  credentials: true, // nawet jak nie używasz cookie, to często pomaga
 }));
 app.use(bodyParser.json());
 
