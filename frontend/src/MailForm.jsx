@@ -1,38 +1,34 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import logo from './assets/logo.png'; // <-- Ścieżka do Twojego logo
+import { useNavigate, useParams } from "react-router-dom";
+import logo from './assets/logo.png';
 
 function MailForm() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { roomId } = useParams(); // <-- pobieranie z URL
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!email.includes('@')) {
-    setError('Podaj poprawny email!');
-    return;
-  }
-  try {
-    const res = await fetch('https://sprawaopolskiegomalarza.onrender.com/api/check-email', {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.includes('@')) {
+      setError('Podaj poprawny email!');
+      return;
+    }
+    // Weryfikuj email pod konkretny roomId
+    const res = await fetch(`https://sprawaopolskiegomalarza.onrender.com/api/room/${roomId}/check-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
     });
-    if (!res.ok) {
-      setError('Błąd połączenia z serwerem!');
-      return;
-    }
     const data = await res.json();
     if (data.exists) {
-      setError('Ten email już był użyty!');
+      setError('Ten email już był użyty w tym pokoju!');
       return;
     }
-    navigate('/room/1');
-  } catch (err) {
-    setError('Nie udało się połączyć z serwerem!');
-  }
-};
+    // Jeżeli OK, przechodzimy do czatu tego pokoju
+    navigate(`/room/${roomId}/chat`);
+  };
+
   return (
     <div style={{
       background: "#1a1a1a",
@@ -46,20 +42,14 @@ function MailForm() {
       flexDirection: "column",
       alignItems: "center"
     }}>
-      {/* LOGO */}
-      <img
-        src={logo}
-        alt="Logo firmy"
-        style={{
-          width: 120,
-          height: 'auto',
-          marginBottom: 18,
-          borderRadius: 14,
-          boxShadow: '0 0 10px #72002655',
-          objectFit: 'contain'
-        }}
-      />
-
+      <img src={logo} alt="Logo firmy" style={{
+        width: 120,
+        height: 'auto',
+        marginBottom: 18,
+        borderRadius: 14,
+        boxShadow: '0 0 10px #72002655',
+        objectFit: 'contain'
+      }} />
       <h2 style={{ marginBottom: 16, textAlign: 'center' }}>
         Wpisz email, aby rozpocząć przesłuchanie
       </h2>
