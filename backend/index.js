@@ -10,7 +10,7 @@ const port = process.env.PORT || 3001;
 
 // --- CORS: Dostosuj do swojego frontu ---
 app.use(cors({
-  origin: 'https://sprawaopolskiegomalarza-1.onrender.com'
+  origin: 'https://sprawaopolskiegomalarza.onrender.com'
 }));
 app.use(bodyParser.json());
 
