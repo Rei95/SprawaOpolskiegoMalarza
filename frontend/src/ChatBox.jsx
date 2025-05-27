@@ -42,7 +42,7 @@ function ChatBox({
     ]);
 
     try {
-      const res = await fetch('http://localhost:3001/api/ask-gpt', {
+      const res = await fetch('https://sprawaopolskiegomalarza-1.onrender.com/api/ask-gpt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
