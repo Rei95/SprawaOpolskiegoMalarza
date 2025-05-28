@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
+function isMobile() {
+  return window.innerWidth < 700;
+}
+
 function ChatBox({
   title = 'Pokój czatu',
   avatar,
@@ -19,15 +23,35 @@ function ChatBox({
   const [ended, setEnded] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClue, setShowClue] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const chatBodyRef = useRef(null);
+  const inputRef = useRef(null);
 
+  // Scroll do dołu przy nowej wiadomości
   useEffect(() => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Detekcja czy klawiatura jest otwarta (na mobile)
+  useEffect(() => {
+    if (!isMobile()) return;
+    const handleFocus = () => setKeyboardOpen(true);
+    const handleBlur = () => setKeyboardOpen(false);
+    if (inputRef.current) {
+      inputRef.current.addEventListener('focus', handleFocus);
+      inputRef.current.addEventListener('blur', handleBlur);
+    }
+    return () => {
+      if (inputRef.current) {
+        inputRef.current.removeEventListener('focus', handleFocus);
+        inputRef.current.removeEventListener('blur', handleBlur);
+      }
+    };
+  }, [inputRef]);
 
   const handleEnd = () => {
     setEnded(true);
@@ -77,10 +101,7 @@ function ChatBox({
   if (ended) {
     return (
       <div className="chat-box-main"
-        style={{
-          justifyContent: 'center',
-        }}
-      >
+        style={{ justifyContent: 'center' }}>
         <h2 style={{ color: '#e05', textAlign: 'center' }}>Przesłuchanie zakończone</h2>
         <p style={{ textAlign: 'center' }}>Dziękujemy za udział! Za chwilę wrócisz do ekranu początkowego.</p>
       </div>
@@ -98,7 +119,6 @@ function ChatBox({
         gap: 10,
         zIndex: 5
       }}>
-        {/* POMOC */}
         <button
           onClick={() => setShowHelp(true)}
           style={{
@@ -119,7 +139,6 @@ function ChatBox({
           }}
           aria-label="Podpowiedź"
         >?</button>
-        {/* GWIAZDKA */}
         <button
           onClick={() => setShowClue(true)}
           style={{
@@ -266,52 +285,49 @@ function ChatBox({
             key={i}
             style={{
               textAlign: msg.from === 'user' ? 'right' : 'left',
-              margin: '10px 0'
+              margin: '12px 0'
             }}
           >
             <span
-              style={{
-                display: 'inline-block',
-                padding: '8px 14px',
-                background: msg.from === 'user' ? '#720026' : '#2a000a',
-                borderRadius: 18,
-                color: '#fff',
-                maxWidth: '70%',
-                wordBreak: 'break-word'
-              }}
+              className={`chat-bubble${msg.from === 'user' ? ' user' : ''}`}
             >
               {msg.text}
             </span>
           </div>
         ))}
       </div>
-      
-      {/* Przycisk i pole na dole */}
+
+      {/* Przycisk "Zakończ Przesłuchanie" - tylko gdy klawiatura nie jest otwarta */}
+      <div className={`end-btn-bar ${keyboardOpen && isMobile() ? 'hide-on-keyboard' : ''}`}>
+        <button
+          onClick={handleEnd}
+          style={{
+            marginTop: 14,
+            background: '#720026',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '12px 28px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px #111',
+            fontSize: 17,
+          }}
+        >
+          Zakończ Przesłuchanie
+        </button>
+      </div>
+
+      {/* Pole do wpisywania i przycisk Wyślij */}
       <form onSubmit={handleSend} className="chat-input-bar">
         <input
+          ref={inputRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Napisz wiadomość..."
         />
         <button type="submit">Wyślij</button>
       </form>
-
-      <button
-        onClick={handleEnd}
-        style={{
-          marginTop: 12,
-          background: '#720026',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 8,
-          padding: '12px 28px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px #111'
-        }}
-      >
-        Zakończ Przesłuchanie
-      </button>
     </div>
   );
 }
