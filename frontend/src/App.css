@@ -3,8 +3,8 @@ html, body, #root {
   margin: 0;
   padding: 0;
   width: 100vw;
-  overflow: hidden;
   background: radial-gradient(circle at 80% 80%, #720026 0%, #111 100%);
+  overflow-x: hidden;
 }
 
 .app-bg {
@@ -13,8 +13,6 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
-  padding: 0;
 }
 
 .chat-box-main {
@@ -30,7 +28,6 @@ html, body, #root {
   flex-direction: column;
   width: 100%;
   align-items: center;
-  margin: 0;
 }
 
 @media (max-width: 700px) {
@@ -42,12 +39,8 @@ html, body, #root {
     min-width: 0 !important;
     min-height: 100vh !important;
     height: 100vh !important;
-    padding: 8px 0 0 0 !important;
-  }
-  .app-bg {
-    padding: 0 !important;
-    min-width: 100vw !important;
-    width: 100vw !important;
+    padding: 0 0 0 0 !important;
+    justify-content: flex-start;
   }
 }
 
@@ -60,6 +53,8 @@ html, body, #root {
   max-height: 60vh;
   scroll-behavior: smooth;
   padding-bottom: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 @media (max-width: 700px) {
@@ -67,6 +62,8 @@ html, body, #root {
     max-height: 52vh !important;
     min-height: 32vh;
     padding-bottom: 12px;
+    padding-left: 4vw;
+    padding-right: 4vw;
   }
 }
 
@@ -74,30 +71,29 @@ html, body, #root {
   width: 100%;
   display: flex;
   gap: 6px;
-  margin-top: auto;
+  margin-top: 0;
   margin-bottom: 0;
   background: #1a1a1a;
+  z-index: 10;
+  position: relative;
 }
 
 @media (max-width: 700px) {
   .chat-input-bar {
     position: fixed;
-    bottom: 0;
     left: 0;
-    right: 0;
-    background: #1a1a1a;
-    padding: 8px 8px 8px 8px;
-    z-index: 15;
-    border-radius: 0;
-    box-shadow: 0 -4px 20px #00000040;
+    bottom: 0;
     width: 100vw;
-    margin: 0;
+    padding: 8px 4vw 16px 4vw;
+    background: #1a1a1a;
+    box-shadow: 0 -2px 16px #00000022;
+    gap: 8px;
   }
 }
 
 .chat-input-bar input {
   flex: 1;
-  padding: 12px 14px;
+  padding: 13px 16px;
   border-radius: 10px;
   border: 2px solid #720026;
   background: #fff;
@@ -105,6 +101,7 @@ html, body, #root {
   font-size: 18px;
   min-width: 0;
   outline: none;
+  margin: 0;
 }
 
 .chat-input-bar button {
@@ -112,13 +109,13 @@ html, body, #root {
   color: #fff;
   border: none;
   border-radius: 10px;
-  padding: 0 20px;
+  padding: 0 18px;
   font-weight: bold;
   cursor: pointer;
   font-size: 18px;
   height: 48px;
-  min-width: 74px;
-  transition: background .15s;
+  min-width: 70px;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,32 +125,23 @@ html, body, #root {
   background: #9d0536;
 }
 
-@media (max-width: 700px) {
-  .chat-input-bar input,
-  .chat-input-bar button {
-    font-size: 18px;
-    height: 48px;
-  }
-}
-
 /* Dymki czatu i tekst */
 .chat-bubble {
   display: inline-block;
-  padding: 11px 18px;
-  font-size: 18px;
+  padding: 12px 18px;
+  font-size: 17px;
   background: #2a000a;
   border-radius: 18px;
   color: #fff;
-  max-width: 76vw;
+  max-width: 85vw;
   word-break: break-word;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 .chat-bubble.user {
   background: #720026;
   text-align: right;
 }
 
-/* Poprawa gwiazdki */
 .star-icon {
   display: flex;
   align-items: center;
@@ -162,26 +150,27 @@ html, body, #root {
   font-size: 27px !important;
 }
 
-/* Schowaj przycisk końca rozmowy, gdy klawiatura jest widoczna na mobilu */
+/* Poprawka przycisku końca przesłuchania */
+.end-btn-bar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  z-index: 9;
+}
 @media (max-width: 700px) {
   .end-btn-bar {
-    position: fixed;
-    bottom: 56px;
-    left: 0;
-    right: 0;
-    z-index: 12;
-    display: flex;
-    justify-content: center;
     width: 100vw;
+    position: fixed;
+    left: 0;
+    bottom: 62px;
+    background: none;
+    margin: 0;
     pointer-events: none;
   }
   .end-btn-bar > button {
     pointer-events: all;
   }
 }
-
-@media (max-width: 700px) {
-  .hide-on-keyboard {
-    display: none !important;
-  }
-}
+.hide-on-keyboard { display: none !important; }
