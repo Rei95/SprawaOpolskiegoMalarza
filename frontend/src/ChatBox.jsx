@@ -96,33 +96,86 @@ function ChatBox({
 
   return (
     <div className="chat-box-main">
-      <div style={{
-        position: 'absolute', top: 18, right: 18, display: 'flex', gap: 10, zIndex: 5
-      }}>
-        <button
-          onClick={() => setShowHelp(true)}
-          style={{
-            width: 44, height: 44, borderRadius: '50%', border: 'none',
-            background: '#e05', color: '#fff', fontWeight: 'bold', fontSize: 22,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-            boxShadow: '0 2px 8px #111', cursor: 'pointer'
-          }}
-          aria-label="Podpowiedź"
-        >?</button>
-        <button
-          onClick={() => setShowClue(true)}
-          style={{
-            width: 44, height: 44, borderRadius: '50%', border: 'none',
-            background: '#e05', color: '#fff700', fontWeight: 'bold', fontSize: 25,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-            boxShadow: '0 2px 8px #111', cursor: 'pointer'
-          }}
-          aria-label="Poszlaka"
-        >
-          <span className="star-icon">★</span>
+
+      {/* Główna sekcja nagłówka */}
+      <div className="header-row">
+        {avatar && (
+          <img
+            src={avatar}
+            alt="Avatar"
+            className="header-avatar"
+          />
+        )}
+        <div style={{ flex: 1 }}></div>
+        <div className="header-buttons">
+          <button
+            className="header-btn"
+            onClick={() => setShowHelp(true)}
+            aria-label="Podpowiedź"
+          >?</button>
+          <button
+            className="header-btn"
+            style={{ background: "#e05", color: "#fff700", position: "relative" }}
+            onClick={() => setShowClue(true)}
+            aria-label="Poszlaka"
+          >
+            {/* Wyśrodkowana gwiazdka SVG */}
+            <svg className="star-icon" viewBox="0 0 24 24">
+              <polygon
+                points="12,3 15,9.5 22,10.3 17,15.1 18.2,21.8 12,18.5 5.8,21.8 7,15.1 2,10.3 9,9.5"
+                fill="#fff700"
+                stroke="#fff700"
+                strokeWidth="1"
+                style={{ display: "block", margin: "auto" }}
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="chat-title">{title}</div>
+
+      <div ref={chatBodyRef} className="chat-messages">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              textAlign: msg.from === 'user' ? 'right' : 'left',
+              margin: '13px 0'
+            }}
+          >
+            <span className={`chat-bubble${msg.from === 'user' ? ' user' : ''}`}>
+              {msg.text}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Przycisk "Zakończ Przesłuchanie" nad inputem */}
+      <div className={`end-btn-bar ${keyboardOpen && isMobile() ? 'hide-on-keyboard' : ''}`}>
+        <button onClick={handleEnd}>
+          Zakończ Przesłuchanie
         </button>
       </div>
 
+      {/* Pole do wpisywania i przycisk Wyślij */}
+      <form onSubmit={handleSend} className="chat-input-bar">
+        <input
+          ref={inputRef}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Napisz wiadomość..."
+          autoComplete="off"
+        />
+        <button type="submit" className="send-btn" aria-label="Wyślij">
+          {/* Wyśrodkowana strzałka (SVG) */}
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 21L21 12L3 3V10L17 12L3 14V21Z" fill="currentColor" />
+          </svg>
+        </button>
+      </form>
+
+      {/* Modale pomocy i poszlaki */}
       {showHelp && (
         <div
           style={{
@@ -190,63 +243,10 @@ function ChatBox({
             <img src={clueImage} alt="Poszlaka" style={{
               maxWidth: 320, maxHeight: 220, borderRadius: 10,
               boxShadow: '0 0 16px #fff70088', marginBottom: 6
-            }} />
+            }}/>
           </div>
         </div>
       )}
-
-      {avatar && (
-        <img
-          src={avatar}
-          alt="Avatar"
-          style={{
-            width: 90, height: 90, objectFit: 'cover',
-            borderRadius: '50%', marginBottom: 12, boxShadow: '0 0 16px #72002677'
-          }}
-        />
-      )}
-
-      <h2 style={{ textAlign: 'center', color: '#e05', margin: 0, marginBottom: 6 }}>{title}</h2>
-
-      <div ref={chatBodyRef} className="chat-messages">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              textAlign: msg.from === 'user' ? 'right' : 'left',
-              margin: '13px 0'
-            }}
-          >
-            <span className={`chat-bubble${msg.from === 'user' ? ' user' : ''}`}>
-              {msg.text}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Przycisk "Zakończ Przesłuchanie" nad inputem */}
-      <div className={`end-btn-bar ${keyboardOpen && isMobile() ? 'hide-on-keyboard' : ''}`}>
-        <button onClick={handleEnd}>
-          Zakończ Przesłuchanie
-        </button>
-      </div>
-
-      {/* Pole do wpisywania i przycisk Wyślij */}
-      <form onSubmit={handleSend} className="chat-input-bar">
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Napisz wiadomość..."
-          autoComplete="off"
-        />
-        <button type="submit" className="send-btn" aria-label="Wyślij">
-          {/* Ikona strzałki (SVG) */}
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 21L21 12L3 3V10L17 12L3 14V21Z" fill="currentColor" />
-          </svg>
-        </button>
-      </form>
     </div>
   );
 }
