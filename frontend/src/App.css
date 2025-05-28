@@ -28,6 +28,7 @@ html, body, #root {
   flex-direction: column;
   width: 100%;
   align-items: center;
+  justify-content: flex-start;
 }
 
 @media (max-width: 700px) {
@@ -39,7 +40,7 @@ html, body, #root {
     min-width: 0 !important;
     min-height: 100vh !important;
     height: 100vh !important;
-    padding: 0 0 0 0 !important;
+    padding: 0 !important;
     justify-content: flex-start;
   }
 }
@@ -47,21 +48,19 @@ html, body, #root {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 12px;
+  margin-top: 14px;
   width: 100%;
-  max-height: 60vh;
+  max-height: 63vh;
   scroll-behavior: smooth;
-  padding-bottom: 2px;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 0 12px;
 }
 
 @media (max-width: 700px) {
   .chat-messages {
-    max-height: 52vh !important;
-    min-height: 32vh;
-    padding-bottom: 12px;
+    max-height: 54vh !important;
+    min-height: 34vh;
+    padding-bottom: 8px;
     padding-left: 4vw;
     padding-right: 4vw;
   }
@@ -70,12 +69,13 @@ html, body, #root {
 .chat-input-bar {
   width: 100%;
   display: flex;
-  gap: 6px;
+  gap: 7px;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: env(safe-area-inset-bottom, 5px);
   background: #1a1a1a;
   z-index: 10;
   position: relative;
+  padding: 0 0 0 0;
 }
 
 @media (max-width: 700px) {
@@ -84,17 +84,17 @@ html, body, #root {
     left: 0;
     bottom: 0;
     width: 100vw;
-    padding: 8px 4vw 16px 4vw;
+    padding: 8px 2vw 12px 2vw;
     background: #1a1a1a;
     box-shadow: 0 -2px 16px #00000022;
-    gap: 8px;
+    gap: 7px;
   }
 }
 
 .chat-input-bar input {
   flex: 1;
-  padding: 13px 16px;
-  border-radius: 10px;
+  padding: 15px 16px;
+  border-radius: 14px;
   border: 2px solid #720026;
   background: #fff;
   color: #111;
@@ -102,44 +102,45 @@ html, body, #root {
   min-width: 0;
   outline: none;
   margin: 0;
+  font-family: inherit;
 }
 
-.chat-input-bar button {
+.send-btn {
   background: #720026;
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 0 18px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 18px;
+  border-radius: 50%;
+  width: 48px;
   height: 48px;
-  min-width: 70px;
-  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  font-size: 23px;
+  min-width: 48px;
+  min-height: 48px;
+  margin: 0;
+  transition: background 0.15s;
 }
+.send-btn:active { background: #9d0536; }
+.send-btn svg { width: 28px; height: 28px; display: block; }
 
-.chat-input-bar button:active {
-  background: #9d0536;
-}
-
-/* Dymki czatu i tekst */
 .chat-bubble {
   display: inline-block;
-  padding: 12px 18px;
-  font-size: 17px;
+  padding: 13px 18px;
+  font-size: 18px;
   background: #2a000a;
-  border-radius: 18px;
+  border-radius: 18px 18px 18px 6px;
   color: #fff;
   max-width: 85vw;
   word-break: break-word;
-  line-height: 1.45;
+  line-height: 1.55;
+  margin-bottom: 3px;
 }
 .chat-bubble.user {
   background: #720026;
   text-align: right;
+  border-radius: 18px 18px 6px 18px;
 }
 
 .star-icon {
@@ -150,27 +151,42 @@ html, body, #root {
   font-size: 27px !important;
 }
 
-/* Poprawka przycisku końca przesłuchania */
+/* Przycisk zakończ rozmowę */
 .end-btn-bar {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 12px;
-  margin-bottom: 4px;
-  z-index: 9;
+  margin-top: 0px;
+  margin-bottom: 8px;
+  z-index: 11;
 }
 @media (max-width: 700px) {
   .end-btn-bar {
     width: 100vw;
     position: fixed;
     left: 0;
-    bottom: 62px;
+    bottom: 64px;
     background: none;
     margin: 0;
     pointer-events: none;
+    z-index: 12;
   }
   .end-btn-bar > button {
     pointer-events: all;
   }
 }
+.end-btn-bar button {
+  background: #720026;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #111;
+  font-size: 17px;
+  transition: background 0.15s;
+}
+.end-btn-bar button:active { background: #9d0536; }
+
 .hide-on-keyboard { display: none !important; }

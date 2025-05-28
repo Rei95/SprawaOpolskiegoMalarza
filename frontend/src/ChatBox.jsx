@@ -24,12 +24,14 @@ function ChatBox({
   const chatBodyRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Scroll do dołu przy każdej nowej wiadomości
   useEffect(() => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // Obsługa wykrywania klawiatury mobilnej
   useEffect(() => {
     if (!isMobile()) return;
     const handleFocus = () => setKeyboardOpen(true);
@@ -212,7 +214,7 @@ function ChatBox({
             key={i}
             style={{
               textAlign: msg.from === 'user' ? 'right' : 'left',
-              margin: '12px 0'
+              margin: '13px 0'
             }}
           >
             <span className={`chat-bubble${msg.from === 'user' ? ' user' : ''}`}>
@@ -222,16 +224,9 @@ function ChatBox({
         ))}
       </div>
 
-      {/* Przycisk "Zakończ Przesłuchanie" – tylko gdy klawiatura nie jest otwarta */}
+      {/* Przycisk "Zakończ Przesłuchanie" nad inputem */}
       <div className={`end-btn-bar ${keyboardOpen && isMobile() ? 'hide-on-keyboard' : ''}`}>
-        <button
-          onClick={handleEnd}
-          style={{
-            background: '#720026', color: '#fff', border: 'none', borderRadius: 8,
-            padding: '12px 28px', fontWeight: 'bold', cursor: 'pointer',
-            boxShadow: '0 2px 8px #111', fontSize: 17
-          }}
-        >
+        <button onClick={handleEnd}>
           Zakończ Przesłuchanie
         </button>
       </div>
@@ -243,8 +238,14 @@ function ChatBox({
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Napisz wiadomość..."
+          autoComplete="off"
         />
-        <button type="submit">Wyślij</button>
+        <button type="submit" className="send-btn" aria-label="Wyślij">
+          {/* Ikona strzałki (SVG) */}
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 21L21 12L3 3V10L17 12L3 14V21Z" fill="currentColor" />
+          </svg>
+        </button>
       </form>
     </div>
   );
