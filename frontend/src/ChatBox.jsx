@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
+function isMobile() { return window.innerWidth < 700; }
 
 function ChatBox({
   title = 'Pokój czatu',
@@ -12,33 +13,48 @@ function ChatBox({
   clueTitle = "Poszlaka",
   onEnd
 }) {
-  const [messages, setMessages] = useState([
-    { from: 'bot', text: firstMessage }
-  ]);
+  const [messages, setMessages] = useState([{ from: 'bot', text: firstMessage }]);
   const [input, setInput] = useState('');
   const [ended, setEnded] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClue, setShowClue] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const msgListRef = useRef(null);
+  const chatBodyRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // SCROLL DO DOŁU PO KAŻDEJ NOWEJ WIADOMOŚCI
+  // Scroll do dołu przy każdej nowej wiadomości
   useEffect(() => {
-    if (msgListRef.current) {
-      msgListRef.current.scrollTop = msgListRef.current.scrollHeight;
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Obsługa wykrywania klawiatury mobilnej
+  useEffect(() => {
+    if (!isMobile()) return;
+    const handleFocus = () => setKeyboardOpen(true);
+    const handleBlur = () => setKeyboardOpen(false);
+    const inp = inputRef.current;
+    if (inp) {
+      inp.addEventListener('focus', handleFocus);
+      inp.addEventListener('blur', handleBlur);
+    }
+    return () => {
+      if (inp) {
+        inp.removeEventListener('focus', handleFocus);
+        inp.removeEventListener('blur', handleBlur);
+      }
+    };
+  }, [inputRef]);
 
   const handleEnd = () => {
     setEnded(true);
     setTimeout(() => {
-      if (onEnd) {
-        onEnd();
-      } else {
-        navigate('/');
-      }
-    }, 600);
+      if (onEnd) onEnd();
+      else navigate('/');
+    }, 500);
   };
 
   const handleSend = async (e) => {
@@ -50,20 +66,17 @@ function ChatBox({
       { from: 'bot', text: '...' }
     ]);
     try {
-      const res = await fetch(
-        `${API_BASE}/api/room/${roomId}/ask-gpt`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: input }),
-        }
-      );
+      const res = await fetch(`${API_BASE}/api/room/${roomId}/ask-gpt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input }),
+      });
       const data = await res.json();
       setMessages(msgs => [
         ...msgs.slice(0, -1),
         { from: 'bot', text: data.answer }
       ]);
-    } catch (error) {
+    } catch {
       setMessages(msgs => [
         ...msgs.slice(0, -1),
         { from: 'bot', text: 'Błąd AI lub połączenia.' }
@@ -74,57 +87,106 @@ function ChatBox({
 
   if (ended) {
     return (
-      <div className="chat-container" style={{justifyContent: 'center', alignItems: 'center', minHeight: '350px'}}>
-        <h2 style={{ color: '#e05', textAlign: 'center', marginTop: 90 }}>Przesłuchanie zakończone</h2>
+      <div className="chat-box-main" style={{ justifyContent: 'center' }}>
+        <h2 style={{ color: '#e05', textAlign: 'center' }}>Przesłuchanie zakończone</h2>
         <p style={{ textAlign: 'center' }}>Dziękujemy za udział! Za chwilę wrócisz do ekranu początkowego.</p>
       </div>
     );
   }
 
   return (
-    <div className="chat-container">
-      {/* HEADER */}
-      <div className="header-area">
-        <div className="avatar-row">
-          {avatar && <img src={avatar} alt="Avatar" className="chat-avatar" />}
-          <div className="action-btns">
-            <button
-              className="round-btn"
-              type="button"
-              aria-label="Podpowiedź"
-              onClick={() => setShowHelp(true)}
-            >?</button>
-            <button
-              className="round-btn star"
-              type="button"
-              aria-label="Poszlaka"
-              onClick={() => setShowClue(true)}
-              style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <svg viewBox="0 0 32 32" width="22" height="22" fill="#ffe400" style={{display: "block", margin: "auto"}}>
-                <polygon points="16,3 20,12 30,12 22,18 25,28 16,22 7,28 10,18 2,12 12,12" />
-              </svg>
-            </button>
-          </div>
+    <div className="chat-box-main">
+      {/* Główna sekcja nagłówka */}
+      <div className="header-row">
+        {avatar && (
+          <img
+            src={avatar}
+            alt="Avatar"
+            className="header-avatar"
+          />
+        )}
+        <div style={{ flex: 1 }}></div>
+        <div className="header-buttons">
+          <button
+            className="header-btn"
+            onClick={() => setShowHelp(true)}
+            aria-label="Podpowiedź"
+          >?</button>
+          <button
+            className="header-btn"
+            style={{ background: "#e05", color: "#fff700", position: "relative" }}
+            onClick={() => setShowClue(true)}
+            aria-label="Poszlaka"
+          >
+            <svg className="star-icon" viewBox="0 0 24 24">
+              <polygon
+                points="12,3 15,9.5 22,10.3 17,15.1 18.2,21.8 12,18.5 5.8,21.8 7,15.1 2,10.3 9,9.5"
+                fill="#fff700"
+                stroke="#fff700"
+                strokeWidth="1"
+                style={{ display: "block", margin: "auto" }}
+              />
+            </svg>
+          </button>
         </div>
-        <div className="chat-title">{title}</div>
+      </div>
+      <div className="chat-title">{title}</div>
+      
+      {/* CHAT BODY */}
+      <div ref={chatBodyRef} className="chat-messages" style={{ marginBottom: "108px" }}>
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              textAlign: msg.from === 'user' ? 'right' : 'left',
+              margin: '13px 0'
+            }}
+          >
+            <span className={`chat-bubble${msg.from === 'user' ? ' user' : ''}`}>
+              {msg.text}
+            </span>
+          </div>
+        ))}
       </div>
 
-      {/* MODALE */}
+      {/* STICKY BOTTOM BAR */}
+      <div className="sticky-bottom-bar">
+        <button className="sticky-end-btn" onClick={handleEnd}>
+          Zakończ Przesłuchanie
+        </button>
+        <form onSubmit={handleSend} className="chat-input-bar">
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Napisz wiadomość..."
+            autoComplete="off"
+          />
+          <button type="submit" className="send-btn" aria-label="Wyślij">
+            <svg viewBox="0 0 24 24" fill="none" style={{ width: 28, height: 28 }}>
+              <path d="M3 21L21 12L3 3V10L17 12L3 14V21Z" fill="currentColor" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      {/* Modale pomocy i poszlaki */}
       {showHelp && (
         <div
           style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(0,0,0,0.65)', display: 'flex',
-            justifyContent: 'center', alignItems: 'center', zIndex: 99
+            position: 'fixed',
+            top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.65)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 99
           }}
           onClick={() => setShowHelp(false)}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: '#1a1a1a', borderRadius: 14, maxWidth: 380, minWidth: 260, padding: 30,
-              color: '#fff', boxShadow: '0 0 34px #72002699', position: 'relative'
+              background: '#1a1a1a', borderRadius: 14, maxWidth: 380,
+              minWidth: 280, padding: 30, color: '#fff',
+              boxShadow: '0 0 34px #72002699', position: 'relative'
             }}>
             <button
               onClick={() => setShowHelp(false)}
@@ -134,26 +196,32 @@ function ChatBox({
               }}
               aria-label="Zamknij"
             >&times;</button>
-            <h2 style={{ marginTop: 0, marginBottom: 16, color: '#e05', textAlign: 'center', fontSize: 22 }}>Podpowiedzi</h2>
-            <div style={{ fontSize: 16, lineHeight: 1.6, textAlign: 'center', whiteSpace: 'pre-line' }}>
+            <h2 style={{
+              marginTop: 0, marginBottom: 16, color: '#e05',
+              textAlign: 'center', fontSize: 22
+            }}>Podpowiedzi</h2>
+            <div style={{
+              fontSize: 16, lineHeight: 1.6, textAlign: 'center', whiteSpace: 'pre-line'
+            }}>
               {helpText}
             </div>
           </div>
         </div>
       )}
+
       {showClue && clueImage && (
         <div
           style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(0,0,0,0.75)', display: 'flex',
-            justifyContent: 'center', alignItems: 'center', zIndex: 100
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100
           }}
           onClick={() => setShowClue(false)}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: '#1a1a1a', borderRadius: 14, maxWidth: 440, minWidth: 260, padding: 26,
+              background: '#1a1a1a', borderRadius: 14, maxWidth: 440, minWidth: 280, padding: 26,
               color: '#fff', boxShadow: '0 0 44px #fff70080', position: 'relative', textAlign: 'center'
             }}>
             <button
@@ -164,46 +232,16 @@ function ChatBox({
               }}
               aria-label="Zamknij"
             >&times;</button>
-            <h2 style={{ marginTop: 0, marginBottom: 20, color: '#fff700', fontWeight: 700 }}>{clueTitle}</h2>
+            <h2 style={{
+              marginTop: 0, marginBottom: 20, color: '#fff700', fontWeight: 700
+            }}>{clueTitle}</h2>
             <img src={clueImage} alt="Poszlaka" style={{
-              maxWidth: 320, maxHeight: 220, borderRadius: 10, boxShadow: '0 0 16px #fff70088', marginBottom: 6
+              maxWidth: 320, maxHeight: 220, borderRadius: 10,
+              boxShadow: '0 0 16px #fff70088', marginBottom: 6
             }}/>
           </div>
         </div>
       )}
-
-      {/* MESSAGES */}
-      <div className="chat-messages" ref={msgListRef}>
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`message-bubble ${msg.from}`}
-          >
-            {msg.text}
-          </div>
-        ))}
-      </div>
-
-      {/* END BUTTON */}
-      <button className="end-btn" onClick={handleEnd}>Zakończ Przesłuchanie</button>
-
-      {/* INPUT + SEND */}
-      <form className="input-row" onSubmit={handleSend} autoComplete="off">
-        <input
-          className="chat-input"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Napisz wiadomość..."
-          maxLength={800}
-          autoFocus={false}
-          style={{fontSize: '1.08rem'}}
-        />
-        <button className="input-send-btn" type="submit" tabIndex={0} aria-label="Wyślij">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-            <path d="M2 24L24 13L2 2V10L17 13L2 16V24Z" fill="white"/>
-          </svg>
-        </button>
-      </form>
     </div>
   );
 }
