@@ -116,15 +116,13 @@ body {
   letter-spacing: 0.1px;
 }
 
-/* Wiadomości czatu - padding na dole pod sticky panel */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 18px 8px 148px 8px; /* DODANY padding-bottom dla sticky dolnego paska */
+  padding: 18px 8px 0 8px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: transparent;
 }
 
 .message-bubble {
@@ -152,104 +150,73 @@ body {
   text-align: right;
 }
 
-/* ----- Sticky Bottom Bar + Input ------ */
-.sticky-bottom-bar {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100vw;
-  max-width: 430px;
-  margin: 0 auto;
-  background: rgba(20,16,17,0.98);
+.input-row {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 0 13px 0;
-  z-index: 99;
-  box-shadow: 0 -2px 20px #72002690;
-  /* transition: bottom 0.22s; */
+  align-items: flex-end;
+  gap: 8px;
+  padding: 0 10px 18px 10px;
+  box-sizing: border-box;
+  background: transparent;
 }
 
-/* Przycisk zakończenia przesłuchania */
-.end-btn,
-.sticky-end-btn {
+.chat-input {
+  flex: 1 1 0;
+  min-height: 44px;
+  max-height: 90px;
+  resize: none;
+  border-radius: 10px;
+  border: 1.5px solid #720026;
+  padding: 10px 15px;
+  font-size: 1.08rem;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.input-send-btn {
+  width: 44px;
+  height: 44px;
+  background: #e05;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px #1115;
+  font-size: 23px;
+  color: #fff;
+  cursor: pointer;
+  transition: background .18s;
+  margin-left: 0;
+  padding: 0;
+}
+.input-send-btn svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.end-btn {
   width: 96%;
   max-width: 330px;
-  margin: 0 auto 7px auto;
+  margin: 0 auto 12px auto;
   background: #a01a3e;
   color: #fff;
   border: none;
   border-radius: 12px;
-  padding: 14px 0;
+  padding: 15px 0;
   font-weight: 700;
   font-size: 1.02rem;
   box-shadow: 0 2px 8px #111;
   cursor: pointer;
   display: block;
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 
-/* Dolna belka inputa */
-.chat-input-bar {
-  width: 97%;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border-radius: 10px;
-  gap: 8px;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.chat-input-bar input,
-.chat-input {
-  flex: 1 1 0;
-  min-height: 46px;
-  max-height: 110px;
-  border-radius: 9px;
-  border: 1.8px solid #e05;
-  padding: 14px 15px;
-  font-size: 1.08rem;
-  background: #fff;
-  color: #111;
-  outline: none;
-  transition: border 0.2s;
-  min-width: 0;
-  resize: none;
-}
-.chat-input-bar input:focus,
-.chat-input:focus {
-  border: 2.2px solid #720026;
-}
-
-.send-btn, .input-send-btn {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: #e05;
-  color: #fff700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  margin-left: 1px;
-  font-size: 1.15rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  box-shadow: 0 2px 8px #111;
-  flex-shrink: 0;
-}
-.send-btn:active, .send-btn:focus {
-  background: #720026;
-}
-.send-btn svg, .input-send-btn svg {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
+/* Scrollbar (opcjonalnie) */
 .chat-messages::-webkit-scrollbar {
   width: 6px;
   background: transparent;
@@ -271,36 +238,8 @@ body {
     margin-top: 10px;
     margin-bottom: 7px;
   }
-  .end-btn,
-  .sticky-end-btn {
+  .end-btn {
     padding: 12px 0;
     font-size: 0.97rem;
-  }
-  .sticky-bottom-bar {
-    max-width: 100vw;
-  }
-  .chat-messages {
-    padding-bottom: 148px; /* sticky panel */
-  }
-}
-
-@media (max-width: 400px) {
-  .chat-title {
-    font-size: 1.12rem;
-  }
-  .chat-avatar {
-    width: 60px; height: 60px;
-  }
-  .sticky-bottom-bar {
-    padding: 7px 0 7px 0;
-  }
-}
-
-@media (max-width: 430px) {
-  .sticky-bottom-bar {
-    max-width: 100vw;
-  }
-  .chat-container {
-    max-width: 100vw;
   }
 }
