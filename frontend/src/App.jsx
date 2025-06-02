@@ -171,6 +171,7 @@ function App() {
       <div className="app-bg">
         <Routes>
           <Route path="/" element={<MailForm />} />
+          <Route path="/kod" element={<CodeEntry />} />
           <Route path="/room/:roomId" element={<RoomChat />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<div style={{ color: 'white', textAlign: 'center', marginTop: 50 }}>404 - Nie znaleziono</div>} />
