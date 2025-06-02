@@ -7,6 +7,7 @@ import {
   useNavigate, // ← DODAJ TO!
 } from "react-router-dom";
 import MailForm from './MailForm';
+import CodeEntry from './CodeEntry';
 import ChatBox from "./ChatBox";
 import './App.css'; // upewnij się że ten plik istnieje!
 import majewskaImg from './assets/majewska.png';
