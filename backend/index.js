@@ -60,7 +60,7 @@ app.post('/api/room/:roomId/ask-gpt', async (req, res) => {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: "GPT-4 Turbo",
+        model: "gpt-4-turbo",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
