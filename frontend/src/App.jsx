@@ -8,10 +8,10 @@ import {
 } from "react-router-dom";
 import MailForm from './MailForm';
 import CodeEntry from './CodeEntry';
+import CodeEntry from './Final';
 import ChatBox from "./ChatBox";
 import './App.css'; // upewnij się że ten plik istnieje!
 import majewskaImg from './assets/majewska.png';
-import prawyImg from './assets/prawy.png';
 import PoszlakaImg from './assets/Poszlaka.png';
 import SwiatowidzImg from './assets/Swiatowidz.png';
 import PapugarniaImg from './assets/Papugarnia.png';
@@ -173,6 +173,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MailForm />} />
           <Route path="/kod" element={<CodeEntry />} />
+          <Route path="/final" element={<Final />} />
           <Route path="/room/:roomId" element={<RoomChat />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<div style={{ color: 'white', textAlign: 'center', marginTop: 50 }}>404 - Nie znaleziono</div>} />
