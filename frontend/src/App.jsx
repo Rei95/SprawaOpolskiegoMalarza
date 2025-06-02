@@ -110,6 +110,7 @@ const chatRooms = {
     avatar: KostenkoImg,
     clueImage: Chaozdj1Img,
     helpText: "Maria Kostenko jest urzędniczką w Opolu. Znała Roberta Majewskiego ale zna też rodziców Marcina Morniaka, warto o nich zapytać. W poszlakach posiada fragment zdjęcia czlonków Klubu Chaoterii.",
+      },
   // Dodaj kolejne pokoje w tym stylu...
 };
 // Komponent renderujący chat na podstawie numeru pokoju
