@@ -1,4 +1,3 @@
-// src/CodeEntry.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +9,7 @@ export default function CodeEntry() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (code === "1530") {
-      window.location.href = "https://sprawaopolskiegomalarza-1.onrender.com/room/62587"; // ← PODMIEN TUTAJ
+      window.location.href = "https://twoj-docelowy-link.pl"; // ← PODMIEN TUTAJ
     } else {
       setError("Błędny kod. Malarz ma twoje koordynaty i zmierza w twoją stronę...");
     }
@@ -19,6 +18,7 @@ export default function CodeEntry() {
   return (
     <div style={styles.bg}>
       <form onSubmit={handleSubmit} style={styles.form}>
+        <div style={styles.lockIcon}>🔒</div>
         <h2 style={styles.title}>Wpisz 4-cyfrowy kod</h2>
         <input
           type="text"
@@ -53,9 +53,14 @@ const styles = {
     width: "90%",
     maxWidth: 400,
   },
+  lockIcon: {
+    fontSize: "2.5rem",
+    color: "#fff",
+    marginBottom: "10px",
+  },
   title: {
     color: "#e6005c",
-    marginBottom: 16,
+    marginBottom: 20,
   },
   input: {
     fontSize: "2em",
@@ -65,9 +70,9 @@ const styles = {
     maxWidth: "200px",
     border: "none",
     borderRadius: "8px",
-    marginBottom: "16px",
     background: "#333",
     color: "#fff",
+    marginBottom: "16px",
   },
   button: {
     backgroundColor: "#720026",
