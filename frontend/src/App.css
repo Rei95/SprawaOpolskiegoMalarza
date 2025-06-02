@@ -8,7 +8,6 @@ body {
   background: radial-gradient(circle at 80% 80%, #720026 0%, #111 100%);
   min-height: 100vh;
   min-width: 100vw;
-  /* KLUCZOWE: blokuj przewijanie strony */
   overflow: hidden;
 }
 
@@ -21,12 +20,11 @@ body {
   overflow: hidden;
 }
 
-/* ---- Czat główny ---- */
 .chat-container {
   background: #1a1a1a;
   width: 100vw;
   max-width: 430px;
-  height: 100vh;           /* ZAWSZE NA WYSOKOŚĆ EKRANU */
+  height: 100vh;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -34,7 +32,7 @@ body {
   position: relative;
   box-shadow: 0 0 24px #72002690;
   padding: 0;
-  overflow: hidden;        /* NIE WYCHODŹ POZA KONTENER */
+  overflow: hidden;
 }
 
 @media (min-width: 600px) {
@@ -122,7 +120,6 @@ body {
   letter-spacing: 0.1px;
 }
 
-/* --- KLUCZOWE: Okno wiadomości --- */
 .chat-messages {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -131,8 +128,8 @@ body {
   flex-direction: column;
   gap: 12px;
   min-height: 0;
-  /* Najważniejsze! Odejmij wysokość nagłówka i inputa. */
-  max-height: calc(100vh - 240px);
+  /* ODEJMUJEMY wysokość inputu i przycisku end-btn! */
+  max-height: calc(100vh - 154px); /* input-row (56px) + end-btn (56px) + marginesy */
 }
 
 .message-bubble {
@@ -160,14 +157,34 @@ body {
   text-align: right;
 }
 
+/* END BUTTON */
+.end-btn {
+  width: 96%;
+  max-width: 330px;
+  margin: 0 auto 7px auto;
+  background: #a01a3e;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 0;
+  font-weight: 700;
+  font-size: 1.02rem;
+  box-shadow: 0 2px 8px #111;
+  cursor: pointer;
+  display: block;
+  z-index: 2;
+}
+
+/* INPUT BAR - zawsze na dole */
 .input-row {
   width: 100%;
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  padding: 0 10px 18px 10px;
+  padding: 0 10px 12px 10px;
   box-sizing: border-box;
   background: transparent;
+  min-height: 56px;
 }
 
 .chat-input {
@@ -208,24 +225,6 @@ body {
   display: block;
 }
 
-.end-btn {
-  width: 96%;
-  max-width: 330px;
-  margin: 0 auto 12px auto;
-  background: #a01a3e;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 15px 0;
-  font-weight: 700;
-  font-size: 1.02rem;
-  box-shadow: 0 2px 8px #111;
-  cursor: pointer;
-  display: block;
-  position: relative;
-  z-index: 1;
-}
-
 /* Scrollbar (opcjonalnie) */
 .chat-messages::-webkit-scrollbar {
   width: 6px;
@@ -255,6 +254,6 @@ body {
     font-size: 0.97rem;
   }
   .chat-messages {
-    max-height: calc(100vh - 210px);
+    max-height: calc(100vh - 154px);
   }
 }
