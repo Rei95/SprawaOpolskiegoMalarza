@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import MailForm from './MailForm';
 import CodeEntry from './CodeEntry';
-import CodeEntry from './Final';
+import Final from './Final';
 import ChatBox from "./ChatBox";
 import './App.css'; // upewnij się że ten plik istnieje!
 import majewskaImg from './assets/majewska.png';
