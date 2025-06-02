@@ -8,6 +8,8 @@ body {
   background: radial-gradient(circle at 80% 80%, #720026 0%, #111 100%);
   min-height: 100vh;
   min-width: 100vw;
+  /* KLUCZOWE: blokuj przewijanie strony */
+  overflow: hidden;
 }
 
 .app-bg {
@@ -16,6 +18,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 /* ---- Czat główny ---- */
@@ -23,18 +26,21 @@ body {
   background: #1a1a1a;
   width: 100vw;
   max-width: 430px;
-  min-height: 100vh;
+  height: 100vh;           /* ZAWSZE NA WYSOKOŚĆ EKRANU */
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
   position: relative;
   box-shadow: 0 0 24px #72002690;
   padding: 0;
+  overflow: hidden;        /* NIE WYCHODŹ POZA KONTENER */
 }
 
 @media (min-width: 600px) {
   .chat-container {
     min-height: 700px;
+    max-height: 90vh;
     border-radius: 20px;
     margin: 40px auto;
   }
@@ -116,13 +122,17 @@ body {
   letter-spacing: 0.1px;
 }
 
+/* --- KLUCZOWE: Okno wiadomości --- */
 .chat-messages {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   padding: 18px 8px 0 8px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  /* Najważniejsze! Odejmij wysokość nagłówka i inputa. */
+  max-height: calc(100vh - 240px);
 }
 
 .message-bubble {
@@ -233,6 +243,8 @@ body {
     border-radius: 0;
     box-shadow: none;
     margin: 0;
+    height: 100vh;
+    max-height: 100vh;
   }
   .header-area {
     margin-top: 10px;
@@ -241,5 +253,8 @@ body {
   .end-btn {
     padding: 12px 0;
     font-size: 0.97rem;
+  }
+  .chat-messages {
+    max-height: calc(100vh - 210px);
   }
 }
