@@ -10,7 +10,7 @@ export default function Final() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (code === "4325") {
-      window.location.href = "https://sprawaopolskiegomalarza-1.onrender.com/room/62587"; // ← PODMIEN TUTAJ
+      window.location.href = "https://forms.gle/MX1AUCePkNgsScdf9"; // ← PODMIEN TUTAJ
     } else {
       setError("Błędny kod. Połącz cztery kolory z czterema cyframi z zagadki Malarza...");
     }
