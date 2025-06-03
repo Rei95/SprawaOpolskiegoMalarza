@@ -69,6 +69,45 @@ function ChatBox({
     }
   }, [showTutorial, tutorialStep]);
 
+  // Przygotuj info który step jest aktywny
+  const currentStepKey = tutorialSteps[tutorialStep]?.key;
+  const highlightHelp = showTutorial && currentStepKey === 'help';
+  const highlightClue = showTutorial && currentStepKey === 'clue';
+  const highlightEnd = showTutorial && currentStepKey === 'end';
+
+  // Wstrzyknięcie stylów globalnych dla animacji pulsacji i podświetlenia
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+    .tutorial-highlight {
+      box-shadow: 0 0 0 3px #ffe400, 0 0 14px 5px #ffe40099;
+      border-radius: 50% !important;
+      animation: tutorial-pulse 1.1s infinite;
+      z-index: 20 !important;
+      position: relative;
+    }
+    .tutorial-highlight-btn {
+      box-shadow: 0 0 0 3px #ffe400, 0 0 18px 3px #ffe400bb;
+      border-radius: 14px !important;
+      animation: tutorial-pulse-btn 1.05s infinite;
+      z-index: 20 !important;
+      position: relative;
+    }
+    @keyframes tutorial-pulse {
+      0% { box-shadow: 0 0 0 2.5px #ffe400, 0 0 12px 2px #ffe40044;}
+      60% { box-shadow: 0 0 0 6px #ffe400, 0 0 22px 9px #ffe400b2;}
+      100% { box-shadow: 0 0 0 2.5px #ffe400, 0 0 12px 2px #ffe40044;}
+    }
+    @keyframes tutorial-pulse-btn {
+      0% { box-shadow: 0 0 0 3px #ffe400, 0 0 12px 2px #ffe40044;}
+      60% { box-shadow: 0 0 0 12px #ffe400, 0 0 36px 13px #ffe400a8;}
+      100% { box-shadow: 0 0 0 3px #ffe400, 0 0 12px 2px #ffe40044;}
+    }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   const handleEnd = () => {
     setEnded(true);
     setTimeout(() => {
@@ -142,21 +181,27 @@ function ChatBox({
           {avatar && <img src={avatar} alt="Avatar" className="chat-avatar" />}
           <div className="action-btns">
             <button
-              className="round-btn"
+              className={`round-btn ${highlightHelp ? "tutorial-highlight" : ""}`}
               id="help-btn"
               type="button"
               aria-label="Podpowiedź"
               onClick={() => setShowHelp(true)}
               tabIndex={0}
-              style={{zIndex: 2}}
+              style={{zIndex: highlightHelp ? 21 : 2}}
             >?</button>
             <button
-              className="round-btn star"
+              className={`round-btn star ${highlightClue ? "tutorial-highlight" : ""}`}
               id="clue-btn"
               type="button"
               aria-label="Poszlaka"
               onClick={() => setShowClue(true)}
-              style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex:2 }}
+              style={{
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: highlightClue ? 21 : 2
+              }}
               tabIndex={0}
             >
               <svg viewBox="0 0 32 32" width="22" height="22" fill="#ffe400" style={{display: "block", margin: "auto"}}>
@@ -244,11 +289,11 @@ function ChatBox({
 
       {/* END BUTTON */}
       <button
-        className="end-btn"
+        className={`end-btn ${highlightEnd ? "tutorial-highlight-btn" : ""}`}
         id="end-btn"
         onClick={handleEnd}
         tabIndex={0}
-        style={{zIndex: 2}}
+        style={{zIndex: highlightEnd ? 21 : 2}}
       >
         Zakończ Przesłuchanie
       </button>
@@ -381,26 +426,4 @@ function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
               border: '1.5px solid #ffe400',
               borderRadius: 12,
               fontWeight: 700,
-              fontSize: '1.05em',
-              padding: '8px 23px',
-              cursor: 'pointer',
-              outline:'none',
-              transition: 'background .18s,color .18s'
-            }}
-          >Pomiń</button>
-        </div>
-        <div style={{
-          fontSize:'0.92em',
-          color:'#ffe40077',
-          marginTop:3,
-          fontWeight:500,
-          letterSpacing:0.4
-        }}>
-          {stepNum+1} / {stepCount}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default ChatBox;
+              font
