@@ -274,9 +274,8 @@ function ChatBox({
   );
 }
 
-// ONBOARDING TOOLTIP
+// ONBOARDING TOOLTIP NOWOCZESNY, DOPASOWANY DO INSPIRACJI
 function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
-  // Find position for the tooltip (responsive, near the target, fallback bottom for mobile)
   const [coords, setCoords] = useState({top: null, left: null, width: null, height: null});
   useEffect(() => {
     const el = document.querySelector(step.selector);
@@ -291,65 +290,84 @@ function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
     }
   }, [step]);
 
-  // Responsywny styl: mobilki – bottom, desktop – przycisk
-  const isMobile = window.innerWidth < 600;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 700;
   let style = {};
   if (isMobile || coords.top === null) {
     style = {
       position: 'fixed',
       left: '50%',
-      bottom: 20,
+      bottom: '48px',
       transform: 'translateX(-50%)',
       zIndex: 3000,
-      maxWidth: 330,
-      width: 'calc(100vw - 32px)',
+      width: 'min(94vw, 370px)',
+      pointerEvents: 'none'
     };
   } else {
     style = {
       position: 'absolute',
-      top: coords.top + coords.height + 10,
-      left: coords.left,
+      top: coords.top + coords.height + 18,
+      left: coords.left + coords.width / 2 - 175,
       zIndex: 3000,
-      maxWidth: 330,
-      minWidth: 200,
+      width: 350,
+      maxWidth: 'calc(100vw - 24px)',
+      minWidth: 180,
+      pointerEvents: 'none'
     };
-    // Jeśli tooltip się nie mieści – popraw na lewo
-    if (coords.left > window.innerWidth / 2) {
-      style.left = coords.left + coords.width - 330;
-      if (style.left < 0) style.left = 10;
-    }
+    if (style.left < 12) style.left = 12;
   }
 
   return (
     <div style={style} className="onboarding-tooltip">
       <div style={{
-        background: '#292932',
-        borderRadius: 16,
-        padding: '22px 20px 16px 20px',
+        background: '#1a1a21F6',
+        borderRadius: 20,
+        boxShadow: '0 6px 32px #0007, 0 0px 0px #fff2',
+        padding: '22px 22px 18px 22px',
         color: '#fff',
-        border: '2px solid #ffe400',
-        boxShadow: '0 4px 24px #0005',
-        fontSize: '1.05rem',
-        lineHeight: 1.5,
+        border: '1.5px solid #ffe400',
+        fontSize: '1.08rem',
+        lineHeight: 1.7,
         textAlign: 'center',
-        position: 'relative',
-        width: '100%',
+        fontWeight: 400,
+        maxWidth: 370,
+        margin: '0 auto',
+        pointerEvents: 'auto',
+        backdropFilter: 'blur(6px)',
+        transition: 'box-shadow 0.3s',
       }}>
-        <b style={{color: '#ffe400', fontSize: '1.09em', display:'block', marginBottom:6}}>{step.title}</b>
-        <div style={{marginBottom: 10}}>{step.text}</div>
-        <div style={{display:'flex', gap:8, justifyContent:'center'}}>
+        <div style={{
+          fontWeight:700,
+          color:'#ffe400',
+          fontSize:'1.17em',
+          marginBottom: 8,
+          letterSpacing:0.2
+        }}>{step.title}</div>
+        <div style={{
+          marginBottom: 16,
+          fontSize: '1.01em',
+          color:'#fff',
+          fontWeight: 500
+        }}>{step.text}</div>
+        <div style={{
+          display:'flex',
+          gap:10,
+          justifyContent:'center',
+          margin:'0 0 12px 0'
+        }}>
           <button
             onClick={onNext}
             style={{
               background: '#ffe400',
-              color: '#1a1a1a',
+              color: '#181818',
               border: 'none',
-              borderRadius: 9,
+              borderRadius: 12,
               fontWeight: 700,
-              fontSize: '1.02em',
-              padding: '7px 18px',
+              fontSize: '1.06em',
+              padding: '8px 26px',
               cursor: 'pointer',
-              marginTop:4
+              boxShadow:'0 2px 12px #ffe40022',
+              outline:'none',
+              transition: 'background .18s',
             }}
             autoFocus
           >
@@ -361,16 +379,23 @@ function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
               background: 'none',
               color: '#ffe400',
               border: '1.5px solid #ffe400',
-              borderRadius: 9,
-              fontWeight: 600,
-              fontSize: '0.97em',
-              padding: '7px 15px',
+              borderRadius: 12,
+              fontWeight: 700,
+              fontSize: '1.05em',
+              padding: '8px 23px',
               cursor: 'pointer',
-              marginTop:4
+              outline:'none',
+              transition: 'background .18s,color .18s'
             }}
           >Pomiń</button>
         </div>
-        <div style={{fontSize:'0.85em', marginTop:5, color:'#ffd700aa'}}>
+        <div style={{
+          fontSize:'0.92em',
+          color:'#ffe40077',
+          marginTop:3,
+          fontWeight:500,
+          letterSpacing:0.4
+        }}>
           {stepNum+1} / {stepCount}
         </div>
       </div>
