@@ -10,16 +10,28 @@ export default function Final() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (code === "4325") {
-      window.location.href = "https://forms.gle/MX1AUCePkNgsScdf9"; // ← PODMIEN TUTAJ
+      window.location.href = "https://forms.gle/daZbJ5JvXdnQyG618";
     } else {
-      setError("Błędny kod. Połącz cztery kolory z czterema cyframi z zagadki Malarza...");
+      setError("Błędny kod. Wciąż nie złamałeś kodu...? Połącz kolory.");
     }
   };
 
   return (
     <div style={styles.bg}>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h2 style={styles.title}>Wpisz 4-cyfrowy kod aby dostać się do formularza finałowego</h2>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="#ffffff"
+          width="48px"
+          height="48px"
+          style={styles.lockIcon}
+        >
+          <path d="M12 17a2 2 0 0 1-1-3.732V12a1 1 0 1 1 2 0v1.268A2 2 0 0 1 12 17zm6-7h-1V7a5 5 0 0 0-10 0v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM9 7a3 3 0 1 1 6 0v3H9V7zm9 13H6v-8h12v8z" />
+        </svg>
+
+        <h2 style={styles.title}>Złam kod Malarza aby wejść do formularza</h2>
+
         <input
           type="text"
           maxLength="4"
@@ -29,7 +41,11 @@ export default function Final() {
           style={styles.input}
           placeholder="____"
         />
-        <button type="submit" style={styles.button}>Sprawdź kod</button>
+
+        <div style={{ marginTop: "16px" }}>
+          <button type="submit" style={styles.button}>Złam kod</button>
+        </div>
+
         {error && <p style={styles.error}>{error}</p>}
       </form>
     </div>
@@ -53,6 +69,9 @@ const styles = {
     width: "90%",
     maxWidth: 400,
   },
+  lockIcon: {
+    marginBottom: 10,
+  },
   title: {
     color: "#e6005c",
     marginBottom: 16,
@@ -65,7 +84,7 @@ const styles = {
     maxWidth: "200px",
     border: "none",
     borderRadius: "8px",
-    marginBottom: "16px",
+    marginBottom: "8px",
     background: "#333",
     color: "#fff",
   },
