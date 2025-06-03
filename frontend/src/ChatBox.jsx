@@ -426,4 +426,26 @@ function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
               border: '1.5px solid #ffe400',
               borderRadius: 12,
               fontWeight: 700,
-              font
+              fontSize: '1.05em',
+              padding: '8px 23px',
+              cursor: 'pointer',
+              outline:'none',
+              transition: 'background .18s,color .18s'
+            }}
+          >Pomiń</button>
+        </div>
+        <div style={{
+          fontSize:'0.92em',
+          color:'#ffe40077',
+          marginTop:3,
+          fontWeight:500,
+          letterSpacing:0.4
+        }}>
+          {stepNum+1} / {stepCount}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ChatBox;
