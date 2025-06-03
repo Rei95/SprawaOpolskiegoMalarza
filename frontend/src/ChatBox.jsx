@@ -3,6 +3,28 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
+// Tutorial steps data
+const tutorialSteps = [
+  {
+    key: 'help',
+    selector: '#help-btn',
+    title: 'Podpowiedź',
+    text: 'Kliknij tutaj, aby uzyskać wskazówki do rozmowy lub pokoju.',
+  },
+  {
+    key: 'clue',
+    selector: '#clue-btn',
+    title: 'Poszlaka',
+    text: 'Tutaj wyświetlisz ważną poszlakę związaną ze sprawą.',
+  },
+  {
+    key: 'end',
+    selector: '#end-btn',
+    title: 'Zakończ przesłuchanie',
+    text: 'Kliknij ten przycisk, aby zakończyć przesłuchanie i wrócić do ekranu głównego.',
+  },
+];
+
 function ChatBox({
   title = 'Pokój czatu',
   avatar,
@@ -19,21 +41,33 @@ function ChatBox({
   const [ended, setEnded] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClue, setShowClue] = useState(false);
-  const [showTutorial, setShowTutorial] = useState({
-    help: false,
-    clue: false,
-    end: false,
-  });
+
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(true);   // tutorial ON by default (change if you want)
+  const [tutorialStep, setTutorialStep] = useState(0);
+
   const navigate = useNavigate();
   const { roomId } = useParams();
   const msgListRef = useRef(null);
 
-  // SCROLL DO DOŁU PO KAŻDEJ NOWEJ WIADOMOŚCI
+  // Scroll to bottom on new message
   useEffect(() => {
     if (msgListRef.current) {
       msgListRef.current.scrollTop = msgListRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Focus element for current tutorial step
+  useEffect(() => {
+    if (!showTutorial) return;
+    const selector = tutorialSteps[tutorialStep]?.selector;
+    if (selector) {
+      const el = document.querySelector(selector);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [showTutorial, tutorialStep]);
 
   const handleEnd = () => {
     setEnded(true);
@@ -77,8 +111,6 @@ function ChatBox({
     setInput('');
   };
 
-  const closeTutorial = () => setShowTutorial({ help: false, clue: false, end: false });
-
   if (ended) {
     return (
       <div className="chat-container" style={{justifyContent: 'center', alignItems: 'center', minHeight: '350px'}}>
@@ -89,28 +121,19 @@ function ChatBox({
   }
 
   return (
-    <div className="chat-container">
-      {/* SAMOUCZKI */}
-      {showTutorial.help && (
-        <TutorialTip onClose={closeTutorial}>
-          <b>Podpowiedź</b><br/>
-          Tutaj znajdziesz wskazówki dotyczące rozmowy lub pokoju.<br/>
-          <i>Kliknij poza okno, aby zamknąć.</i>
-        </TutorialTip>
-      )}
-      {showTutorial.clue && (
-        <TutorialTip onClose={closeTutorial}>
-          <b>Poszlaka</b><br/>
-          Tutaj możesz zobaczyć ważną poszlakę (np. zdjęcie, notatkę).<br/>
-          <i>Kliknij poza okno, aby zamknąć.</i>
-        </TutorialTip>
-      )}
-      {showTutorial.end && (
-        <TutorialTip onClose={closeTutorial}>
-          <b>Zakończ przesłuchanie</b><br/>
-          Kliknij ten przycisk, by zakończyć rozmowę i wrócić do ekranu głównego.<br/>
-          <i>Kliknij poza okno, aby zamknąć.</i>
-        </TutorialTip>
+    <div className="chat-container" style={{position:'relative'}}>
+      {/* TUTORIAL DYMKI */}
+      {showTutorial && (
+        <OnboardingTooltip
+          step={tutorialSteps[tutorialStep]}
+          stepNum={tutorialStep}
+          stepCount={tutorialSteps.length}
+          onNext={() => {
+            if (tutorialStep < tutorialSteps.length - 1) setTutorialStep(s => s + 1);
+            else setShowTutorial(false);
+          }}
+          onSkip={() => setShowTutorial(false)}
+        />
       )}
 
       {/* HEADER */}
@@ -120,16 +143,21 @@ function ChatBox({
           <div className="action-btns">
             <button
               className="round-btn"
+              id="help-btn"
               type="button"
               aria-label="Podpowiedź"
-              onClick={() => setShowTutorial({ help: true, clue: false, end: false })}
+              onClick={() => setShowHelp(true)}
+              tabIndex={0}
+              style={{zIndex: 2}}
             >?</button>
             <button
               className="round-btn star"
+              id="clue-btn"
               type="button"
               aria-label="Poszlaka"
-              onClick={() => setShowTutorial({ help: false, clue: true, end: false })}
-              style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => setShowClue(true)}
+              style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex:2 }}
+              tabIndex={0}
             >
               <svg viewBox="0 0 32 32" width="22" height="22" fill="#ffe400" style={{display: "block", margin: "auto"}}>
                 <polygon points="16,3 20,12 30,12 22,18 25,28 16,22 7,28 10,18 2,12 12,12" />
@@ -217,9 +245,10 @@ function ChatBox({
       {/* END BUTTON */}
       <button
         className="end-btn"
+        id="end-btn"
         onClick={handleEnd}
-        onMouseEnter={() => setShowTutorial({ help: false, clue: false, end: true })}
-        onMouseLeave={closeTutorial}
+        tabIndex={0}
+        style={{zIndex: 2}}
       >
         Zakończ Przesłuchanie
       </button>
@@ -245,34 +274,105 @@ function ChatBox({
   );
 }
 
-// TutorialTip component – NA KOŃCU pliku, przed exportem
-function TutorialTip({ children, onClose }) {
+// ONBOARDING TOOLTIP
+function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
+  // Find position for the tooltip (responsive, near the target, fallback bottom for mobile)
+  const [coords, setCoords] = useState({top: null, left: null, width: null, height: null});
+  useEffect(() => {
+    const el = document.querySelector(step.selector);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setCoords({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+  }, [step]);
+
+  // Responsywny styl: mobilki – bottom, desktop – przycisk
+  const isMobile = window.innerWidth < 600;
+  let style = {};
+  if (isMobile || coords.top === null) {
+    style = {
+      position: 'fixed',
+      left: '50%',
+      bottom: 20,
+      transform: 'translateX(-50%)',
+      zIndex: 3000,
+      maxWidth: 330,
+      width: 'calc(100vw - 32px)',
+    };
+  } else {
+    style = {
+      position: 'absolute',
+      top: coords.top + coords.height + 10,
+      left: coords.left,
+      zIndex: 3000,
+      maxWidth: 330,
+      minWidth: 200,
+    };
+    // Jeśli tooltip się nie mieści – popraw na lewo
+    if (coords.left > window.innerWidth / 2) {
+      style.left = coords.left + coords.width - 330;
+      if (style.left < 0) style.left = 10;
+    }
+  }
+
   return (
-    <div
-      style={{
-        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-        background: 'rgba(0,0,0,0.40)', display: 'flex',
-        justifyContent: 'center', alignItems: 'flex-end', zIndex: 200
-      }}
-      onClick={onClose}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          marginBottom: 80,
-          background: '#292932',
-          borderRadius: 18,
-          padding: '22px 28px',
-          color: '#fff',
-          boxShadow: '0 2px 24px #0004',
-          maxWidth: 350,
-          minWidth: 250,
-          fontSize: '1.13rem',
-          textAlign: 'center',
-          border: '2px solid #ffe400'
-        }}
-      >
-        {children}
+    <div style={style} className="onboarding-tooltip">
+      <div style={{
+        background: '#292932',
+        borderRadius: 16,
+        padding: '22px 20px 16px 20px',
+        color: '#fff',
+        border: '2px solid #ffe400',
+        boxShadow: '0 4px 24px #0005',
+        fontSize: '1.05rem',
+        lineHeight: 1.5,
+        textAlign: 'center',
+        position: 'relative',
+        width: '100%',
+      }}>
+        <b style={{color: '#ffe400', fontSize: '1.09em', display:'block', marginBottom:6}}>{step.title}</b>
+        <div style={{marginBottom: 10}}>{step.text}</div>
+        <div style={{display:'flex', gap:8, justifyContent:'center'}}>
+          <button
+            onClick={onNext}
+            style={{
+              background: '#ffe400',
+              color: '#1a1a1a',
+              border: 'none',
+              borderRadius: 9,
+              fontWeight: 700,
+              fontSize: '1.02em',
+              padding: '7px 18px',
+              cursor: 'pointer',
+              marginTop:4
+            }}
+            autoFocus
+          >
+            {stepNum < stepCount-1 ? "Dalej" : "Zamknij"}
+          </button>
+          <button
+            onClick={onSkip}
+            style={{
+              background: 'none',
+              color: '#ffe400',
+              border: '1.5px solid #ffe400',
+              borderRadius: 9,
+              fontWeight: 600,
+              fontSize: '0.97em',
+              padding: '7px 15px',
+              cursor: 'pointer',
+              marginTop:4
+            }}
+          >Pomiń</button>
+        </div>
+        <div style={{fontSize:'0.85em', marginTop:5, color:'#ffd700aa'}}>
+          {stepNum+1} / {stepCount}
+        </div>
       </div>
     </div>
   );
