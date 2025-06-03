@@ -19,6 +19,11 @@ function ChatBox({
   const [ended, setEnded] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClue, setShowClue] = useState(false);
+  const [showTutorial, setShowTutorial] = useState({
+    help: false,
+    clue: false,
+    end: false,
+  });
   const navigate = useNavigate();
   const { roomId } = useParams();
   const msgListRef = useRef(null);
@@ -72,6 +77,8 @@ function ChatBox({
     setInput('');
   };
 
+  const closeTutorial = () => setShowTutorial({ help: false, clue: false, end: false });
+
   if (ended) {
     return (
       <div className="chat-container" style={{justifyContent: 'center', alignItems: 'center', minHeight: '350px'}}>
@@ -83,6 +90,29 @@ function ChatBox({
 
   return (
     <div className="chat-container">
+      {/* SAMOUCZKI */}
+      {showTutorial.help && (
+        <TutorialTip onClose={closeTutorial}>
+          <b>Podpowiedź</b><br/>
+          Tutaj znajdziesz wskazówki dotyczące rozmowy lub pokoju.<br/>
+          <i>Kliknij poza okno, aby zamknąć.</i>
+        </TutorialTip>
+      )}
+      {showTutorial.clue && (
+        <TutorialTip onClose={closeTutorial}>
+          <b>Poszlaka</b><br/>
+          Tutaj możesz zobaczyć ważną poszlakę (np. zdjęcie, notatkę).<br/>
+          <i>Kliknij poza okno, aby zamknąć.</i>
+        </TutorialTip>
+      )}
+      {showTutorial.end && (
+        <TutorialTip onClose={closeTutorial}>
+          <b>Zakończ przesłuchanie</b><br/>
+          Kliknij ten przycisk, by zakończyć rozmowę i wrócić do ekranu głównego.<br/>
+          <i>Kliknij poza okno, aby zamknąć.</i>
+        </TutorialTip>
+      )}
+
       {/* HEADER */}
       <div className="header-area">
         <div className="avatar-row">
@@ -92,13 +122,13 @@ function ChatBox({
               className="round-btn"
               type="button"
               aria-label="Podpowiedź"
-              onClick={() => setShowHelp(true)}
+              onClick={() => setShowTutorial({ help: true, clue: false, end: false })}
             >?</button>
             <button
               className="round-btn star"
               type="button"
               aria-label="Poszlaka"
-              onClick={() => setShowClue(true)}
+              onClick={() => setShowTutorial({ help: false, clue: true, end: false })}
               style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <svg viewBox="0 0 32 32" width="22" height="22" fill="#ffe400" style={{display: "block", margin: "auto"}}>
@@ -185,7 +215,14 @@ function ChatBox({
       </div>
 
       {/* END BUTTON */}
-      <button className="end-btn" onClick={handleEnd}>Zakończ Przesłuchanie</button>
+      <button
+        className="end-btn"
+        onClick={handleEnd}
+        onMouseEnter={() => setShowTutorial({ help: false, clue: false, end: true })}
+        onMouseLeave={closeTutorial}
+      >
+        Zakończ Przesłuchanie
+      </button>
 
       {/* INPUT + SEND */}
       <form className="input-row" onSubmit={handleSend} autoComplete="off">
@@ -204,6 +241,39 @@ function ChatBox({
           </svg>
         </button>
       </form>
+    </div>
+  );
+}
+
+// TutorialTip component – NA KOŃCU pliku, przed exportem
+function TutorialTip({ children, onClose }) {
+  return (
+    <div
+      style={{
+        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+        background: 'rgba(0,0,0,0.40)', display: 'flex',
+        justifyContent: 'center', alignItems: 'flex-end', zIndex: 200
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          marginBottom: 80,
+          background: '#292932',
+          borderRadius: 18,
+          padding: '22px 28px',
+          color: '#fff',
+          boxShadow: '0 2px 24px #0004',
+          maxWidth: 350,
+          minWidth: 250,
+          fontSize: '1.13rem',
+          textAlign: 'center',
+          border: '2px solid #ffe400'
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
