@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
-// Tutorial steps data
 const tutorialSteps = [
   {
     key: 'help',
@@ -43,11 +42,10 @@ function ChatBox({
   const [showClue, setShowClue] = useState(false);
 
   // Tutorial state
-  const [showTutorial, setShowTutorial] = useState(true);   // tutorial ON by default
+  const [showTutorial, setShowTutorial] = useState(true);
   const [tutorialStep, setTutorialStep] = useState(0);
 
-  // ← DODANO: stan na liczbę zadanych pytań oraz blokadę pola
-  const MAX_QUESTIONS = 5; // maksymalna liczba pytań
+  const MAX_QUESTIONS = 5;
   const [questionsCount, setQuestionsCount] = useState(0);
   const [chatBlocked, setChatBlocked] = useState(false);
 
@@ -55,14 +53,20 @@ function ChatBox({
   const { roomId } = useParams();
   const msgListRef = useRef(null);
 
-  // Scroll to bottom on new message
+  // Blokada czatu na podstawie localStorage (przy wejściu do pokoju)
+  useEffect(() => {
+    if (roomId && localStorage.getItem('blocked-room-' + roomId) === '1') {
+      setChatBlocked(true);
+      setQuestionsCount(MAX_QUESTIONS);
+    }
+  }, [roomId]);
+
   useEffect(() => {
     if (msgListRef.current) {
       msgListRef.current.scrollTop = msgListRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Focus element for current tutorial step
   useEffect(() => {
     if (!showTutorial) return;
     const selector = tutorialSteps[tutorialStep]?.selector;
@@ -74,13 +78,11 @@ function ChatBox({
     }
   }, [showTutorial, tutorialStep]);
 
-  // Przygotuj info który step jest aktywny
   const currentStepKey = tutorialSteps[tutorialStep]?.key;
   const highlightHelp = showTutorial && currentStepKey === 'help';
   const highlightClue = showTutorial && currentStepKey === 'clue';
   const highlightEnd = showTutorial && currentStepKey === 'end';
 
-  // Wstrzyknięcie stylów globalnych dla animacji pulsacji i podświetlenia
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
@@ -113,8 +115,7 @@ function ChatBox({
     return () => document.head.removeChild(style);
   }, []);
 
-  // Usunięta cała logika obsługi przycisku "Zakończ Przesłuchanie"
-  // const handleEnd = () => { ... }
+  // handleEnd usunięty - przycisk "Zakończ przesłuchanie" usunięty
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -150,6 +151,9 @@ function ChatBox({
     setQuestionsCount(count => {
       if (count + 1 >= MAX_QUESTIONS) {
         setChatBlocked(true);
+        if (roomId) {
+          localStorage.setItem('blocked-room-' + roomId, '1');
+        }
       }
       return count + 1;
     });
@@ -291,8 +295,6 @@ function ChatBox({
           </div>
         ))}
       </div>
-
-      {/* END BUTTON usunięty */}
 
       {/* Komunikat o zablokowaniu czatu */}
       {chatBlocked && (
