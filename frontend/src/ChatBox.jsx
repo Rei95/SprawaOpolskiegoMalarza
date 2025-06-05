@@ -43,8 +43,13 @@ function ChatBox({
   const [showClue, setShowClue] = useState(false);
 
   // Tutorial state
-  const [showTutorial, setShowTutorial] = useState(true);   // tutorial ON by default (change if you want)
+  const [showTutorial, setShowTutorial] = useState(true);   // tutorial ON by default
   const [tutorialStep, setTutorialStep] = useState(0);
+
+  // ← DODANO: stan na liczbę zadanych pytań oraz blokadę pola
+  const MAX_QUESTIONS = 5; // maksymalna liczba pytań
+  const [questionsCount, setQuestionsCount] = useState(0);
+  const [chatBlocked, setChatBlocked] = useState(false);
 
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -119,14 +124,19 @@ function ChatBox({
     }, 600);
   };
 
+  // ← ZMIENIONE: handleSend z licznikiem pytań i blokadą
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    // Jeśli czat zablokowany, nic nie rób
+    if (chatBlocked || !input.trim()) return;
+
+    // Dodaj wiadomość użytkownika i pustego bota na czas oczekiwania
     setMessages(msgs => [
       ...msgs,
       { from: 'user', text: input },
       { from: 'bot', text: '...' }
     ]);
+
     try {
       const res = await fetch(
         `${API_BASE}/api/room/${roomId}/ask-gpt`,
@@ -137,6 +147,7 @@ function ChatBox({
         }
       );
       const data = await res.json();
+      // Zastąp puste „...” odpowiedzią
       setMessages(msgs => [
         ...msgs.slice(0, -1),
         { from: 'bot', text: data.answer }
@@ -147,7 +158,15 @@ function ChatBox({
         { from: 'bot', text: 'Błąd AI lub połączenia.' }
       ]);
     }
+
     setInput('');
+    // Zwiększ licznik pytań i sprawdź limit
+    setQuestionsCount(count => {
+      if (count + 1 >= MAX_QUESTIONS) {
+        setChatBlocked(true);
+      }
+      return count + 1;
+    });
   };
 
   if (ended) {
@@ -298,18 +317,44 @@ function ChatBox({
         Zakończ Przesłuchanie
       </button>
 
+      {/* ← DODANO: Komunikat o zablokowaniu czatu */}
+      {chatBlocked && (
+        <div style={{
+          background: '#222',
+          color: '#ffe400',
+          padding: '18px 22px',
+          borderRadius: 15,
+          margin: '20px auto 8px auto',
+          maxWidth: 380,
+          textAlign: 'center',
+          fontWeight: 600,
+          fontSize: '1.08em',
+          boxShadow: '0 2px 12px #ffe40011'
+        }}>
+          Świadek zakończył z Tobą rozmowę. Nie możesz już zadawać więcej pytań.
+        </div>
+      )}
+
       {/* INPUT + SEND */}
       <form className="input-row" onSubmit={handleSend} autoComplete="off">
         <input
           className="chat-input"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Napisz wiadomość..."
+          placeholder={chatBlocked ? "Limit pytań wyczerpany" : "Napisz wiadomość..."} // ← ZMIENIONE
           maxLength={800}
           autoFocus={false}
           style={{fontSize: '1.08rem'}}
+          disabled={chatBlocked} // ← ZMIENIONE
         />
-        <button className="input-send-btn" type="submit" tabIndex={0} aria-label="Wyślij">
+        <button
+          className="input-send-btn"
+          type="submit"
+          tabIndex={0}
+          aria-label="Wyślij"
+          disabled={chatBlocked} // ← ZMIENIONE
+          style={chatBlocked ? {opacity: 0.5, cursor: 'not-allowed'} : {}}
+        >
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
             <path d="M2 24L24 13L2 2V10L17 13L2 16V24Z" fill="white"/>
           </svg>
