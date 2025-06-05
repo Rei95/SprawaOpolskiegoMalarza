@@ -8,7 +8,7 @@ const tutorialSteps = [
     key: 'help',
     selector: '#help-btn',
     title: 'Podpowiedź',
-    text: 'Kliknij tutaj, aby uzyskać wskazówki do rozmowy lub pokoju.',
+    text: 'Kliknij tutaj, aby uzyskać wskazówki do rozmowy z konkretnym świadkiem.',
   },
   {
     key: 'clue',
@@ -20,14 +20,14 @@ const tutorialSteps = [
     key: 'end',
     selector: '#end-btn',
     title: 'Zakończ przesłuchanie',
-    text: 'Kliknij ten przycisk, aby zakończyć przesłuchanie i wrócić do ekranu głównego.',
+    text: 'Pamiętaj, masz 5 pytań. Po ich przekroczeniu świadek kończy z Tobą rozmowę. Zadawaj pytania rozważnie.',
   },
 ];
 
 function ChatBox({
   title = 'Pokój czatu',
   avatar,
-  firstMessage = 'Świadek stoi przed Tobą, zacznij rozmowę detektywie!',
+  firstMessage = 'Zacznij rozmowę ze świadkiem!',
   helpText = "Brak podpowiedzi dla tego pokoju.",
   clueImage,
   clueTitle = "Poszlaka",
