@@ -9,26 +9,26 @@ const tutorialSteps = [
     key: 'help',
     selector: '#help-btn',
     title: 'Podpowiedź',
-    text: 'Kliknij tutaj, aby uzyskać wskazówki do tego jak prowadzić rozmowę i o co pytać.',
+    text: 'Kliknij tutaj, aby uzyskać wskazówki do rozmowy lub pokoju.',
   },
   {
     key: 'clue',
     selector: '#clue-btn',
     title: 'Poszlaka',
-    text: 'Tutaj wyświetlisz ważną poszlakę związaną ze sprawą lub inne podpowiedzi.',
+    text: 'Tutaj wyświetlisz ważną poszlakę związaną ze sprawą.',
   },
   {
     key: 'end',
     selector: '#end-btn',
     title: 'Zakończ przesłuchanie',
-    text: 'Kliknij ten przycisk, aby zakończyć przesłuchanie. Po 5 zadanych pytaniach rozmowa zakończy się - Zadawaj pytania ostrożnie.',
+    text: 'Kliknij ten przycisk, aby zakończyć przesłuchanie i wrócić do ekranu głównego.',
   },
 ];
 
 function ChatBox({
   title = 'Pokój czatu',
   avatar,
-  firstMessage = 'Zacznij rozmowę ze świadkiem Detektywie!',
+  firstMessage = 'Świadek stoi przed Tobą, zacznij rozmowę detektywie!',
   helpText = "Brak podpowiedzi dla tego pokoju.",
   clueImage,
   clueTitle = "Poszlaka",
@@ -113,24 +113,13 @@ function ChatBox({
     return () => document.head.removeChild(style);
   }, []);
 
-  const handleEnd = () => {
-    setEnded(true);
-    setTimeout(() => {
-      if (onEnd) {
-        onEnd();
-      } else {
-        navigate('/');
-      }
-    }, 600);
-  };
+  // Usunięta cała logika obsługi przycisku "Zakończ Przesłuchanie"
+  // const handleEnd = () => { ... }
 
-  // ← ZMIENIONE: handleSend z licznikiem pytań i blokadą
   const handleSend = async (e) => {
     e.preventDefault();
-    // Jeśli czat zablokowany, nic nie rób
     if (chatBlocked || !input.trim()) return;
 
-    // Dodaj wiadomość użytkownika i pustego bota na czas oczekiwania
     setMessages(msgs => [
       ...msgs,
       { from: 'user', text: input },
@@ -147,7 +136,6 @@ function ChatBox({
         }
       );
       const data = await res.json();
-      // Zastąp puste „...” odpowiedzią
       setMessages(msgs => [
         ...msgs.slice(0, -1),
         { from: 'bot', text: data.answer }
@@ -158,9 +146,7 @@ function ChatBox({
         { from: 'bot', text: 'Błąd AI lub połączenia.' }
       ]);
     }
-
     setInput('');
-    // Zwiększ licznik pytań i sprawdź limit
     setQuestionsCount(count => {
       if (count + 1 >= MAX_QUESTIONS) {
         setChatBlocked(true);
@@ -306,18 +292,9 @@ function ChatBox({
         ))}
       </div>
 
-      {/* END BUTTON */}
-      <button
-        className={`end-btn ${highlightEnd ? "tutorial-highlight-btn" : ""}`}
-        id="end-btn"
-        onClick={handleEnd}
-        tabIndex={0}
-        style={{zIndex: highlightEnd ? 21 : 2}}
-      >
-        Zakończ Przesłuchanie
-      </button>
+      {/* END BUTTON usunięty */}
 
-      {/* ← DODANO: Komunikat o zablokowaniu czatu */}
+      {/* Komunikat o zablokowaniu czatu */}
       {chatBlocked && (
         <div style={{
           background: '#222',
@@ -341,18 +318,18 @@ function ChatBox({
           className="chat-input"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder={chatBlocked ? "Limit pytań wyczerpany" : "Napisz wiadomość..."} // ← ZMIENIONE
+          placeholder={chatBlocked ? "Limit pytań wyczerpany" : "Napisz wiadomość..."}
           maxLength={800}
           autoFocus={false}
           style={{fontSize: '1.08rem'}}
-          disabled={chatBlocked} // ← ZMIENIONE
+          disabled={chatBlocked}
         />
         <button
           className="input-send-btn"
           type="submit"
           tabIndex={0}
           aria-label="Wyślij"
-          disabled={chatBlocked} // ← ZMIENIONE
+          disabled={chatBlocked}
           style={chatBlocked ? {opacity: 0.5, cursor: 'not-allowed'} : {}}
         >
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
@@ -364,7 +341,6 @@ function ChatBox({
   );
 }
 
-// ONBOARDING TOOLTIP NOWOCZESNY, DOPASOWANY DO INSPIRACJI
 function OnboardingTooltip({ step, stepNum, stepCount, onNext, onSkip }) {
   const [coords, setCoords] = useState({top: null, left: null, width: null, height: null});
   useEffect(() => {
